@@ -1,0 +1,147 @@
+# CDDL HEADER START
+#
+# This file and its contents are supplied under the terms of the
+# Common Development and Distribution License ("CDDL"), version 1.0.
+# You may only use this file in accordance with the terms of version
+# 1.0 of the CDDL.
+#
+# A full copy of the text of the CDDL should have accompanied this
+# source.  A copy of the CDDL is also available via the Internet at
+# http://www.illumos.org/license/CDDL.
+#
+# CDDL HEADER END
+
+# Copyright 2017 Saso Kiselkov. All rights reserved.
+
+msgid ""
+msgstr ""
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>"
+
+msgid "Can't start planner: aircraft not stationary."
+msgstr ""
+
+msgid ""
+"Can't start planner: pushback already in progress. Please stop the pushback "
+"operation first."
+msgstr ""
+
+msgid "Can't start pushback planner: please set the parking brake first."
+msgstr ""
+
+msgid ""
+"Pushback advisory: you have your radio volume turned very low and may not be "
+"able to hear ground crew. Please increase your radio volume in the X-Plane "
+"sound preferences."
+msgstr ""
+
+msgid ""
+"Pushback failure: X-Plane version too old. This plugin requires at least X-"
+"Plane %s to operate."
+msgstr ""
+
+msgid "Pushback failure: aircraft appears to not have any steerable gears."
+msgstr ""
+
+msgid ""
+"Pushback failure: aircraft has non-positive wheelbase. Sorry, tail draggers "
+"aren't supported."
+msgstr ""
+
+msgid "Pushback failure: aircraft is incompatible with BetterPushback."
+msgstr ""
+
+msgid ""
+"Pushback failure: master requested tug \"%s\", which we don't have in our in "
+"our library. Please sync your tug libraries before trying again."
+msgstr ""
+
+msgid "Pushback failure: no suitable tug for your aircraft."
+msgstr ""
+
+msgid ""
+"Pushback failure: smartcopilot attempted to switch master/slave or network "
+"connection lost. Stopping operation."
+msgstr ""
+
+msgid "Start pushback"
+msgstr ""
+
+msgid "Stop pushback"
+msgstr ""
+
+msgid "Start pushback planner"
+msgstr ""
+
+msgid "Stop pushback planner"
+msgstr ""
+
+msgid "Connect tug before entering pushback plan"
+msgstr ""
+
+msgid "Pre-plan pushback"
+msgstr ""
+
+msgid "Close pushback planner"
+msgstr ""
+
+msgid "Preferences..."
+msgstr ""
+
+msgid "BetterPushback Preferences"
+msgstr ""
+
+msgid "User interface"
+msgstr ""
+
+msgid "X-Plane's language"
+msgstr ""
+
+msgid "Ground crew audio"
+msgstr ""
+
+msgid "My language only at domestic airports"
+msgstr ""
+
+msgid "My language at all airports"
+msgstr ""
+
+msgid "English at all airports"
+msgstr ""
+
+msgid "Save preferences"
+msgstr ""
+
+msgid "Ground crew speaks my language only if the country the airport is\n"
+"in speaks my language. Otherwise the ground crew speaks English\n"
+"with a local accent."
+msgstr ""
+
+msgid "Ground crew speaks my language irrespective of what country the "
+"airport is in."
+msgstr ""
+
+msgid "Ground crew always speaks English with a local accent."
+msgstr ""
+
+msgid "Save current preferences to disk."
+msgstr ""
+
+msgid "Disconnect tow + headset and switch to hand signals."
+msgstr ""
+
+msgid "Reconnect tow and await further instructions."
+msgstr ""
+
+msgid "Pushback failure: cannot push this aircraft with engines running. "
+"Shutdown engines first."
+msgstr ""
+
+msgid "Pushback failure: your flight controls are preventing me from steering "
+"the aircraft. Unbind any buttons you have set to\"toggle nosewheel steering\"."
+msgstr ""
+
+msgid "Left mouse button to reorient view"
+msgstr ""
+
+msgid "Tug cab view"
+msgstr ""

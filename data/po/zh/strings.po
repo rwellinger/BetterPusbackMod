@@ -1,0 +1,164 @@
+# CDDL HEADER START
+#
+# This file and its contents are supplied under the terms of the
+# Common Development and Distribution License ("CDDL"), version 1.0.
+# You may only use this file in accordance with the terms of version
+# 1.0 of the CDDL.
+#
+# A full copy of the text of the CDDL should have accompanied this
+# source.  A copy of the CDDL is also available via the Internet at
+# http://www.illumos.org/license/CDDL.
+#
+# CDDL HEADER END
+
+# Copyright 2017 Saso Kiselkov. All rights reserved.
+
+msgid ""
+msgstr ""
+"Last-Translator: Ayatsuki Renge <nyanpasu@nanon.net>"
+
+msgid "Can't start planner: aircraft not stationary."
+msgstr "无法规划推出:飞机不在静止状态"
+
+msgid ""
+"Can't start planner: pushback already in progress. Please stop the pushback "
+"operation first."
+msgstr "无法规划推出:当前正在推出中,请先停止推出操作"
+
+msgid "Can't start pushback planner: please set the parking brake first."
+msgstr "无法规划推出:请先设置停机刹车"
+
+msgid ""
+"Pushback advisory: you have your radio volume turned very low and may not be "
+"able to hear ground crew. Please increase your radio volume in the X-Plane "
+"sound preferences."
+msgstr ""
+"推出建议:你的无线电音量过低,可能无法听清地勤人员的指示."
+"请考虑在X-Plane的声音设置中提高音量"
+
+msgid ""
+"Pushback failure: X-Plane version too old. This plugin requires at least X-"
+"Plane %s to operate."
+msgstr ""
+"推出失败:X-Plane版本过低,本插件的需要最低X-Plane版本为%s"
+
+msgid "Pushback failure: aircraft appears to not have any steerable gears."
+msgstr ""
+"推出失败:飞机似乎没有可转向的轮子"
+
+msgid ""
+"Pushback failure: aircraft has non-positive wheelbase. Sorry, tail draggers "
+"aren't supported."
+msgstr ""
+"推出失败:这架飞机的轴距为负.抱歉,不支持后轮推车"
+
+msgid "Pushback failure: aircraft is incompatible with BetterPushback."
+msgstr ""
+"推出失败:飞机与本插件不兼容"
+
+msgid ""
+"Pushback failure: master requested tug \"%s\", which we don't have in our in "
+"our library. Please sync your tug libraries before trying again."
+msgstr ""
+"推出失败:后推车%s不在车库中,请更新车库后重试"
+
+msgid "Pushback failure: no suitable tug for your aircraft."
+msgstr ""
+"推出失败:没有合适的后推车"
+
+msgid ""
+"Pushback failure: smartcopilot attempted to switch master/slave or network "
+"connection lost. Stopping operation."
+msgstr ""
+"推出失败:smartcopilot正在切换主从或网络连接断开.停止推车"
+
+msgid "Start pushback"
+msgstr "开始推出"
+
+msgid "Stop pushback"
+msgstr "停止推出"
+
+msgid "Start pushback planner"
+msgstr "开始规划推出"
+
+msgid "Stop pushback planner"
+msgstr "停止规划推出"
+
+msgid "Connect tug before entering pushback plan"
+msgstr "先连接后推车,然后开始规划推出"
+
+msgid "Pre-plan pushback"
+msgstr "规划推出"
+
+msgid "Close pushback planner"
+msgstr "关闭推出规划"
+
+msgid "Preferences..."
+msgstr "设置..."
+
+msgid "BetterPushback Preferences"
+msgstr "BetterPushback设置"
+
+msgid "User interface"
+msgstr "用户界面"
+
+msgid "X-Plane's language"
+msgstr "X-Plane语言"
+
+msgid "Ground crew audio"
+msgstr "地勤语音"
+
+msgid "My language only at domestic airports"
+msgstr "只在国内机场使用我的语言"
+
+msgid "My language at all airports"
+msgstr "所有机场都使用我的语言"
+
+msgid "English at all airports"
+msgstr "所有机场都使用英语"
+
+msgid "Save preferences"
+msgstr "保存设置"
+
+msgid "Ground crew speaks my language only if the country the airport is\n"
+"in speaks my language. Otherwise the ground crew speaks English\n"
+"with a local accent."
+msgstr ""
+"地勤人员只在我的国家说我的语言,否则说英语"
+
+msgid "Ground crew speaks my language irrespective of what country the "
+"airport is in."
+msgstr ""
+"地勤人员无论在哪都说我的语言"
+
+msgid "Ground crew always speaks English with a local accent."
+msgstr ""
+"地勤人员无论在哪都说英语"
+
+msgid "Save current preferences to disk."
+msgstr ""
+"保存当前设置"
+
+msgid "Disconnect tow + headset and switch to hand signals."
+msgstr ""
+"断开后推车与耳机,等待手势信号"
+
+msgid "Reconnect tow and await further instructions."
+msgstr ""
+"重新连接后推车,等待进一步指示"
+
+msgid "Pushback failure: cannot push this aircraft with engines running. "
+"Shutdown engines first."
+msgstr ""
+"推出失败:飞机发动机运转时无法推出.请先关闭发动机."
+
+msgid "Pushback failure: your flight controls are preventing me from steering "
+"the aircraft. Unbind any buttons you have set to\"toggle nosewheel steering\"."
+msgstr ""
+"推出失败:前轮转向受干扰.请先解除绑定所有\"切换前轮转向\"的按钮"
+
+msgid "Left mouse button to reorient view"
+msgstr "使用鼠标左键来控制视角"
+
+msgid "Tug cab view"
+msgstr "后推车视角"

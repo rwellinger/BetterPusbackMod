@@ -1,0 +1,203 @@
+#!/bin/bash
+
+# CDDL HEADER START
+#
+# This file and its contents are supplied under the terms of the
+# Common Development and Distribution License ("CDDL"), version 1.0.
+# You may only use this file in accordance with the terms of version
+# 1.0 of the CDDL.
+#
+# A full copy of the text of the CDDL should have accompanied this
+# source.  A copy of the CDDL is also available via the Internet at
+# http://www.illumos.org/license/CDDL.
+#
+# CDDL HEADER END
+
+# Copyright 2022 Saso Kiselkov. All rights reserved.
+
+# Some Cleanup's
+
+# Delivery File Name
+ZIP_DELIVERY_FILE="BetterPushback_XP12_V104.zip"
+
+rm -rf BetterPushback_XP12_*.zip
+rm -rf win_x64
+rm -rf lin_x64
+
+CMAKE_OPTS_COMMON="-DCMAKE_BUILD_TYPE=Release"
+
+DIST_FILES=(
+    'COPYING'					''
+    'data/msgs/README.txt'			''
+    'data/msgs/cc_aliases.cfg'			''
+    'objects/tugs/LIVERIES_HOWTO.txt'		''
+    'objects/night_lamp.obj'			''
+)
+
+function install_xtra_file() {
+	FILE="$1"
+	DSTDIR="$2"
+	if [[ "$DSTDIR" = "//PNG2DDS//" ]]; then
+		DSTDIR=""
+		XFERCMD="convert"
+		TGTFILE="$(basename "$FILE")"
+		TGTFILE="${TGTFILE/%.png/.dds}"
+	else
+		TGTFILE="$(basename "$FILE")"
+		XFERCMD="cp"
+	fi
+	if [[ "$DSTDIR" = "" ]]; then
+		DSTDIR="$(dirname "$FILE")"
+	fi
+	mkdir -p "BetterPushback/$DSTDIR"
+	$XFERCMD "$FILE" "BetterPushback/$DSTDIR/$TGTFILE"
+}
+
+function install_xtra_files() {
+	for (( I=0; $I < ${#DIST_FILES[@]}; I=$I + 2 )); do
+		install_xtra_file "${DIST_FILES[$I]}" "${DIST_FILES[$I + 1]}"
+	done
+}
+
+function install_audio_files() {
+	FILES=(
+		'connected.opus'
+		'disco.opus'
+		'done_left.opus'
+		'done_right.opus'
+		'driving_up.opus'
+		'op_complete.opus'
+		'plan_end.opus'
+		'plan_start.opus'
+		'ready2conn.opus'
+		'start_pb.opus'
+		'start_tow.opus'
+		'connected.opus'
+		'disco.opus'
+		'driving_up.opus'
+		'op_complete.opus'
+		'plan_end.opus'
+		'plan_start.opus'
+		'ready2conn.opus'
+		'start_pb.opus'
+		'start_tow.opus'
+		'winch.opus'
+	)
+	find data/msgs -type f -iname '*.opus' | while read; do
+		install_xtra_file "$REPLY" ""
+	done
+}
+
+function install_icon_files() {
+	FILES=(
+		'accept_plan.png'
+		'conn_first.png'
+		'delete_seg.png'
+		'place_seg.png'
+		'cancel_plan.png'
+		'move_view.png'
+		'rotate_seg.png'
+		'disconnect.png'
+		'reconnect.png'
+	)
+	for DIR in data/icons/[a-z][a-z]; do
+		for FILE in ${FILES[@]}; do
+			install_xtra_file "$DIR/$FILE" ""
+		done
+	done
+}
+
+function install_tug_files() {
+	FILES=( $( find objects/tugs/*.tug -type f \
+	    '(' -iname '*.obj' -or -iname '*.cfg' -or -iname '*.wav' -or \
+	    -iname '*.opus' -or -iname '*.png' ')' ) )
+	for FILE in ${FILES[@]}; do
+		install_xtra_file "$FILE" ""
+	done
+}
+
+function install_po_files() {
+	FILES=( $( find data/po -iname '*.po' ) )
+	for FILE in ${FILES[@]}; do
+		install_xtra_file "$FILE" ""
+	done
+}
+
+while getopts "nh" o; do
+	case "${o}" in
+	n)
+		if [[ $(uname) != "Darwin" ]]; then
+			echo "Codesigning and notarization can only be done" \
+			    "on macOS" >&2
+			exit 1
+		fi
+		notarize=1
+		;;
+	h)
+		cat << EOF
+Usage: $0 [-nh]
+    -n : (macOS-only) Codesign & notarize the resulting XPL after build
+         Note: requires that you create a file named user.make in the
+         notarize directory with DEVELOPER_USERNAME and DEVELOPER_PASSWORD
+         set. See notarize/notarize.make for more information.
+    -h : show this help screen and exit.
+EOF
+		exit
+		;;
+	*)
+		echo "Unknown option $o. Try $0 -h for help." >&2
+		exit 1
+		;;
+	esac
+done
+
+rm -rf BetterPushback
+mkdir -p BetterPushback
+
+set -e
+
+# We'll try to build on N+1 CPUs we have available. The extra +1 is to allow
+# for one make instance to be blocking on disk.
+HOST_OS="$(uname)"
+if [[ "$HOST_OS" = "Darwin" ]]; then
+	NCPUS=$(( $(sysctl -n hw.ncpu) + 1 ))
+else
+	NCPUS=$(( $(grep 'processor[[:space:]]\+:' /proc/cpuinfo  | wc -l) + \
+	    1 ))
+fi
+
+case `uname` in
+Linux)
+	( cd src && rm -f CMakeCache.txt && \
+	    cmake $CMAKE_OPTS_COMMON -DCMAKE_TOOLCHAIN_FILE=XCompile.cmake \
+	    -DHOST=x86_64-w64-mingw32 . && make clean && make -j${NCPUS} &&
+	    rm -f libBetterPushback.xpl.dll.a )
+	( cd src && rm -f CMakeCache.txt && cmake $CMAKE_OPTS_COMMON . \
+	    && make clean && make -j${NCPUS} )
+	strip {win_x64,lin_x64}/BetterPushback.xpl
+	cp -r {win_x64,lin_x64} BetterPushback
+	;;
+Darwin)
+	( cd src && rm -f CMakeCache.txt && cmake $CMAKE_OPTS_COMMON . \
+	    && make clean && make -j${NCPUS} )
+	if [ -n "$notarize" ]; then
+		make -f notarize/notarize.make notarize
+	fi
+	cp -r mac_x64 BetterPushback
+	;;
+*)
+	echo "Unsupported platform" >&2
+	exit 1
+	;;
+esac
+
+install_xtra_files
+install_po_files
+install_audio_files
+install_icon_files
+install_tug_files
+
+# Build Delivery
+zip -r ${ZIP_DELIVERY_FILE} BetterPushback
+
+set +e
