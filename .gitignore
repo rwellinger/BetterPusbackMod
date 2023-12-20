@@ -1,0 +1,13 @@
+.idea
+lin64
+win64
+mac64
+BetterPushback_XP12_*.zip
+BetterPushback
+lin_x64
+win_x64
+src/cmake-build-debug
+src/CMakeFiles
+src/CMakeCache.txt
+src/cmake_install.cmake
+src/Makefile
