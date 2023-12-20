@@ -1,6 +1,6 @@
 # About BetterPushback
 
-This is a pushback plugin for the X-Plane 11 flight simulator.
+This is a pushback plugin for the X-Plane 12 flight simulator.
 It provides an overhead view to plan a pushback route and
 accomplishes a fully automated "hands-off" pushback, letting the user
 focus on aircraft startup and other pilot duties during pushback. It can
