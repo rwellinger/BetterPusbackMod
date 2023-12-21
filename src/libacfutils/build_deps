@@ -40,11 +40,12 @@ if [[ "$minimal" == 0 ]]; then
 	rm -f .minimal-deps
 fi
 
-if [[ "$do_clean" != 1 ]]; then
-	git submodule init mingw-std-threads && \
-	git submodule update --merge --recursive && \
-	( cd mingw-std-threads && git checkout 6c2061b7da41d6aa1b2162ff4383ec3ece864bc6 )
-fi
+# There is no more submodule included
+#if [[ "$do_clean" != 1 ]]; then
+#	git submodule init mingw-std-threads && \
+#	git submodule update --merge --recursive && \
+#	( cd mingw-std-threads && git checkout 6c2061b7da41d6aa1b2162ff4383ec3ece864bc6 )
+#fi
 
 function check_brew_install() {
 	if ! which "$1" &> /dev/null; then
