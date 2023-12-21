@@ -1,3 +1,4 @@
+*.cbp
 .idea
 lin64
 win64
@@ -12,3 +13,5 @@ src/CMakeFiles
 src/CMakeCache.txt
 src/cmake_install.cmake
 src/Makefile
+src/.cmake
+src/Testing
