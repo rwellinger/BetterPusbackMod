@@ -47,6 +47,17 @@ For details on how to add tug liveries, see
 
 To add a voice set, see `data/msgs/README.txt` for the information.
 
+## libacfutils Library Required
+
+I removed from the project. It need to by downloaded separatly. To make sure you have a matched version, take the fork in my repository.
+To connect with the library setup the Library in the "CMakeLists.txt" File in the "src" directory.
+
+file(GLOB LIBACFUTILS "../../../libs/libacfutils")
+
+The Library Fork from my side you can found here:
+https://github.com/rwellinger/libacfutils
+
+
 ## Additional Information
 
 This is a Modification of the original version of "Better Pushback". As there
