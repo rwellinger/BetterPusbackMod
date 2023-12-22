@@ -16,8 +16,8 @@
  * Copyright 2017 Saso Kiselkov. All rights reserved.
  */
 
-#ifndef	_BP_XPLANE_H_
-#define	_BP_XPLANE_H_
+#ifndef    _BP_XPLANE_H_
+#define    _BP_XPLANE_H_
 
 #include <stdlib.h>
 
@@ -57,18 +57,25 @@ extern XPLMHostApplicationID bp_host_id;
  * X-Plane-specific plugin hooks.
  */
 PLUGIN_API int XPluginStart(char *name, char *sig, char *desc);
+
 PLUGIN_API void XPluginStop(void);
+
 PLUGIN_API int XPluginEnable(void);
+
 PLUGIN_API void XPluginDisable(void);
+
 PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, int msg, void *param);
 
 void bp_reconnect_notify(void);
+
 void bp_done_notify(void);
+
 const char *bp_get_lang(void);
+
 void bp_sched_reload(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	/* _BP_XPLANE_H_ */
+#endif    /* _BP_XPLANE_H_ */

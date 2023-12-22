@@ -16,8 +16,8 @@
  * Copyright 2017 Saso Kiselkov. All rights reserved.
  */
 
-#ifndef	_FF_A320_INTF_H_
-#define	_FF_A320_INTF_H_
+#ifndef    _FF_A320_INTF_H_
+#define    _FF_A320_INTF_H_
 
 #include <acfutils/types.h>
 
@@ -26,10 +26,11 @@ extern "C" {
 #endif
 
 bool_t ff_a320_intf_init(void);
+
 void ff_a320_intf_fini(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	/* _FF_A320_INTF_H_ */
+#endif    /* _FF_A320_INTF_H_ */
