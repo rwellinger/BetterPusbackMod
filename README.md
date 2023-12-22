@@ -29,9 +29,8 @@ https://github.com/skiselkov/BetterPushbackC
 
 ## Downloading BetterPushback
 
-To download and use BetterPushback, simply click on "Release" at the top
-download the file labeled `BetterPushBack_lin_mac_win.zip` for the latest version.
-The files labeled `Source Code` are *not* what you want.
+You can get the lest release from here:
+https://forums.x-plane.org/index.php?/files/file/89033-better-pushback-mod-x-plane-12/
 
 ## Building BetterPushback
 
