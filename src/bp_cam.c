@@ -772,6 +772,7 @@ draw_icon(button_t *btn, int x, int y, double scale, bool_t is_clicked,
         glVertex2f(x + btn->w * scale, y + btn->h * scale);
         glVertex2f(x + btn->w * scale, y + btn->h * scale);
         glVertex2f(x + btn->w * scale, y);
+        glVertex2f(x + btn->w * scale, y);
         glVertex2f(x, y);
         glEnd();
         XPLMSetGraphicsState(0, 1, 0, 0, 1, 0, 0);
