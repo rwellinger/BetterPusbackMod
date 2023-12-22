@@ -57,11 +57,3 @@ file(GLOB LIBACFUTILS "../../../libs/libacfutils")
 
 The Library Fork from my side you can found here:
 https://github.com/rwellinger/libacfutils
-
-
-## Additional Information
-
-This is a Modification of the original version of "Better Pushback". As there
-was no more progress on the repository for, at least 2 years.
-The idea of this new repository is to "keep it a live". That's it.
-No additional features are planned.
