@@ -29,8 +29,10 @@ https://github.com/skiselkov/BetterPushbackC
 
 ## Downloading BetterPushback
 
-You can get the lest release from here:
+You can get the last binary release from here:
+
 https://forums.x-plane.org/index.php?/files/file/89033-better-pushback-mod-x-plane-12/
+
 
 ## Building BetterPushback
 
@@ -46,7 +48,7 @@ For details on how to add tug liveries, see
 
 To add a voice set, see `data/msgs/README.txt` for the information.
 
-## libacfutils Library Required
+### libacfutils Library Required
 
 I removed from the project. It need to by downloaded separatly. To make sure you have a matched version, take the fork in my repository.
 To connect with the library setup the Library in the "CMakeLists.txt" File in the "src" directory.
