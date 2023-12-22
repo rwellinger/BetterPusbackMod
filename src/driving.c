@@ -230,8 +230,8 @@ compute_segs_impl(const vehicle_t *veh, vect2_t start_pos, double start_hdg,
     if (IS_NULL_VECT(turn_edge)) {
         if (recurse) {
             return (compute_segs_oblique(veh, start_pos, start_hdg,
-                                         end_pos, end_hdg, segs, backward, min_radius *
-                                                                           OBLIQUE_RADIUS_FACT));
+                                         end_pos, end_hdg, segs, backward,
+                                         min_radius * OBLIQUE_RADIUS_FACT));
         } else {
             return (-1);
         }
@@ -248,8 +248,8 @@ compute_segs_impl(const vehicle_t *veh, vect2_t start_pos, double start_hdg,
     if (r < min_radius) {
         if (recurse)
             return (compute_segs_oblique(veh, start_pos, start_hdg,
-                                         end_pos, end_hdg, segs, backward, min_radius *
-                                                                           OBLIQUE_RADIUS_FACT));
+                                         end_pos, end_hdg, segs, backward,
+                                         min_radius * OBLIQUE_RADIUS_FACT));
         else
             return (-1);
     }

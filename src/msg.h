@@ -16,48 +16,52 @@
  * Copyright 2017 Saso Kiselkov. All rights reserved.
  */
 
-#ifndef	_MSG_H_
-#define	_MSG_H_
+#ifndef    _MSG_H_
+#define    _MSG_H_
 
 #include <acfutils/types.h>
 
-#ifdef	__cplusplus
+#ifdef    __cplusplus
 extern "C" {
 #endif
 
 typedef enum {
-	LANG_PREF_MATCH_REAL,
-	LANG_PREF_NATIVE,
-	LANG_PREF_MATCH_ENGLISH
+    LANG_PREF_MATCH_REAL,
+    LANG_PREF_NATIVE,
+    LANG_PREF_MATCH_ENGLISH
 } lang_pref_t;
 
 typedef enum {
-	MSG_PLAN_START,
-	MSG_PLAN_END,
-	MSG_DRIVING_UP,
-	MSG_RDY2CONN,
-	MSG_RDY2CONN_NOPARK,
-	MSG_WINCH,
-	MSG_CONNECTED,
-	MSG_START_PB,
-	MSG_START_TOW,
-	MSG_START_PB_NOSTART,
-	MSG_START_TOW_NOSTART,
-	MSG_OP_COMPLETE,
-	MSG_DISCO,
-	MSG_DONE_RIGHT,
-	MSG_DONE_LEFT,
-	MSG_NUM_MSGS
+    MSG_PLAN_START,
+    MSG_PLAN_END,
+    MSG_DRIVING_UP,
+    MSG_RDY2CONN,
+    MSG_RDY2CONN_NOPARK,
+    MSG_WINCH,
+    MSG_CONNECTED,
+    MSG_START_PB,
+    MSG_START_TOW,
+    MSG_START_PB_NOSTART,
+    MSG_START_TOW_NOSTART,
+    MSG_OP_COMPLETE,
+    MSG_DISCO,
+    MSG_DONE_RIGHT,
+    MSG_DONE_LEFT,
+    MSG_NUM_MSGS
 } message_t;
 
 bool_t msg_init(const char *my_lang, const char *icao, lang_pref_t lang_pref);
+
 void msg_fini();
+
 void msg_play(message_t msg);
+
 void msg_stop(void);
+
 double msg_dur(message_t msg);
 
-#ifdef	__cplusplus
+#ifdef    __cplusplus
 }
 #endif
 
-#endif	/* _MSG_H_ */
+#endif    /* _MSG_H_ */
