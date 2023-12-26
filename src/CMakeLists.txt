@@ -36,7 +36,7 @@ else()
 endif()
 
 # Build path setup
-file(GLOB LIBACFUTILS "../../../libs/libacfutils")
+file(GLOB LIBACFUTILS "../../libacfutils")
 file(GLOB GLEW_PREFIX "${LIBACFUTILS}/glew/glew-1.13.0-${PLAT_LONG}/install")
 file(GLOB OPENAL_PREFIX
     "${LIBACFUTILS}/openal-soft/openal-soft-1.21.0-${PLAT_LONG}/build/install")

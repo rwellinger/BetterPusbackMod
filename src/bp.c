@@ -1038,6 +1038,7 @@ bp_init(void) {
     const char *reason;
     dr_t radio_vol, sound_on;
     char my_acf[512], my_path[512];
+    char *acf_override_file;
 
     /*
      * Due to numerous spurious bug reports of missing ground crew audio,
@@ -1150,7 +1151,16 @@ bp_init(void) {
 
     XPLMGetNthAircraftModel(0, my_acf, my_path);
 
-    bp_ls.outline = acf_outline_read(my_path);
+    acf_override_file  = mkpathname(bp_xpdir, bp_plugindir, "objects", "override", my_acf, NULL);
+    if (file_exists(acf_override_file, NULL)) {
+        logMsg(BP_INFO_LOG "acf override file found in %s : using it  ", acf_override_file);
+        bp_ls.outline = acf_outline_read(acf_override_file);
+    } else {
+        //logMsg(BP_INFO_LOG "acf override file NOT found: using original file %s ", my_path);
+        bp_ls.outline = acf_outline_read(my_path);
+    }
+    free(acf_override_file);
+
     if (bp_ls.outline == NULL)
         goto errout;
 

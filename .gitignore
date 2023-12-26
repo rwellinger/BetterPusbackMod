@@ -15,3 +15,5 @@ src/cmake_install.cmake
 src/Makefile
 src/.cmake
 src/Testing
+build_release_ob
+src/CMakeLists.txt

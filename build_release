@@ -123,6 +123,13 @@ function install_po_files() {
 	done
 }
 
+function install_override_files() {
+	FILES=( $( find objects/override -iname '*.acf' ) )
+	for FILE in ${FILES[@]}; do
+		install_xtra_file "$FILE" ""
+	done
+}
+
 while getopts "nh" o; do
 	case "${o}" in
 	n)
@@ -196,6 +203,7 @@ install_po_files
 install_audio_files
 install_icon_files
 install_tug_files
+install_override_files
 
 # Build Delivery
 zip -r ${ZIP_DELIVERY_FILE} BetterPushback
