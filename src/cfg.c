@@ -293,8 +293,10 @@ layout_checkboxes(checkbox_t *checkboxes, int x, int y, tooltip_set_t *tts) {
                                  width - (off_x - x), BUTTON_HEIGHT, 1,
                                  checkboxes[i].string, 0, main_win, xpWidgetClass_Caption);
         if (checkboxes[i].tooltip != NULL) {
-            tooltip_new(tts, x, y, CHECKBOX_SIZE + width,
-                        BUTTON_HEIGHT, _(checkboxes[i].tooltip));
+          UNUSED(tts);  
+          // Issue with the widget lib, removing for now
+          //  tooltip_new(tts, x, y, CHECKBOX_SIZE + width,
+          //              BUTTON_HEIGHT, _(checkboxes[i].tooltip));
         }
         y += BUTTON_HEIGHT;
     }
@@ -439,7 +441,7 @@ create_main_window(void) {
         buttons.var = create_widget_rel(x, y, B_FALSE, w, h, 1, \
             label, 0, main_win, xpWidgetClass_Button); \
         if (tooltip != NULL) { \
-            tooltip_new(tts, x, y, w, h, _(tooltip)); \
+         /*   tooltip_new(tts, x, y, w, h, _(tooltip));  */ \
         } \
     } while (0)
 
