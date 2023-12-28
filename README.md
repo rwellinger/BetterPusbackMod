@@ -55,5 +55,7 @@ To connect with the library setup the Library in the "CMakeLists.txt" File in th
 
 file(GLOB LIBACFUTILS "../../../libs/libacfutils")
 
-The Library Fork from my side you can found here:
-https://github.com/rwellinger/libacfutils
+As I found out in the last view days the relation to this library are very hard and many issues come from here ... it is not possible to splitup the library.
+
+The library can be found here:
+https://github.com/skiselkov/libacfutils
