@@ -513,16 +513,18 @@ bp_conf_save(void) {
 
     path = mkpathname(CONF_DIRS, CONF_FILENAME, NULL);
     fp = fopen(path, "wb");
-    if (fp != NULL && (conf_write(bp_conf, fp) >= 0)) {
-        logMsg(BP_INFO_LOG "Write config file %s", path);
-        res = B_TRUE;
-    } else {
-        logMsg(BP_ERROR_LOG "Error writing configuration %s: %s", path,
-               strerror(errno));
+
+    if (fp != NULL) {
+        if (conf_write(bp_conf, fp)) {
+            logMsg(BP_INFO_LOG "Write config file %s", path);
+            res = B_TRUE;
+        } else {
+            logMsg(BP_ERROR_LOG "Error writing configuration %s: %s", path,
+                   strerror(errno));
+        }
+        fclose(fp);
     }
 
-    if (fp != NULL)
-        fclose(fp);
     free(path);
 
     return (res);
