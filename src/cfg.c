@@ -439,7 +439,7 @@ create_main_window(void) {
         buttons.var = create_widget_rel(x, y, B_FALSE, w, h, 1, \
             label, 0, main_win, xpWidgetClass_Button); \
         if (tooltip != NULL) { \
-         /*   tooltip_new(tts, x, y, w, h, _(tooltip));  */ \
+            tooltip_new(tts, x, y, w, h, _(tooltip));   \
         } \
     } while (0)
 
