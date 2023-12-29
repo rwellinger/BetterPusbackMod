@@ -34,6 +34,12 @@ You can get the last binary release from here:
 https://forums.x-plane.org/index.php?/files/file/89033-better-pushback-mod-x-plane-12/
 
 
+Some Beta / Pre-Releases can be found here:
+
+https://github.com/rwellinger/BetterPusbackMod/releases
+(Please be aware that the pre release maybe still has some issues inside and maybe is not final tested.)
+
+
 ## Building BetterPushback
 
 To build BetterPushback yourself you need either a Linux or a Mac
