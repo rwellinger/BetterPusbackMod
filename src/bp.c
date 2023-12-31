@@ -393,6 +393,19 @@ acf_is_compatible(void) {
     return (B_TRUE);
 }
 
+static bool_t
+acf_is_airfoillabs_ka350(void)
+{
+	char my_acf[512], my_path[512];
+	char my_author[512];
+
+	XPLMGetNthAircraftModel(0, my_acf, my_path);
+	dr_gets(&drs.author, my_author, sizeof (my_author));
+	return ((strcmp(my_acf, "KA350.acf") == 0 ||
+                 strcmp(my_acf, "KA350_GPS.acf") == 0) &&
+	    strcmp(my_author, "Airfoillabs") == 0);
+}
+
 /*
  * Locates the airport nearest to our current location, but which is also
  * within 10km (MAX_ARPT_DIST). If a suitable airport is found, its ICAO
@@ -2005,7 +2018,7 @@ pb_step_stopping(void) {
          */
         bp.step_start_t = bp.cur_t;
     } else {
-        if (!slave_mode)
+        if (!slave_mode && !acf_is_airfoillabs_ka350())
             brakes_set(B_TRUE);
         if (bp.cur_t - bp.step_start_t >= STATE_TRANS_DELAY) {
             msg_play(MSG_OP_COMPLETE);
@@ -2021,7 +2034,8 @@ pb_step_stopped(void) {
     if (!slave_mode) {
         turn_nosewheel(0);
         push_at_speed(0, bp.veh.max_accel, B_FALSE, B_FALSE);
-        brakes_set(B_TRUE);
+        if (!acf_is_airfoillabs_ka350())
+            brakes_set(B_TRUE);
     }
     if (!pbrake_is_set()) {
         /*
@@ -2048,7 +2062,8 @@ pb_step_lowering(void) {
 
     if (!slave_mode) {
         turn_nosewheel(0);
-        brakes_set(B_TRUE);
+        if (!acf_is_airfoillabs_ka350())
+            brakes_set(B_TRUE);
     }
 
     if (bp.cur_t - bp.last_voice_t < msg_dur(MSG_OP_COMPLETE)) {
