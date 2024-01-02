@@ -106,8 +106,7 @@ const char *disco_when_done_tooltip =
         "the tug when the pushback operation is complete.";
 const char *hide_xp11_tug_tooltip =
         "Hides default X-Plane 11 pushback tug.\n"
-        "Restart X-Plane for this change to take effect.\n"
-        "This operation is not supported on X-Plane 12.";
+        "Restart X-Plane for this change to take effect.";
 
 static void
 buttons_update(void) {
@@ -119,7 +118,7 @@ buttons_update(void) {
 
     (void) conf_get_str(bp_conf, "lang", &lang);
     (void) conf_get_b(bp_conf, "disco_when_done", &disco_when_done);
-    (void) conf_get_b(bp_conf, "show_dev_menu", &show_dev_menu);
+    //(void) conf_get_b(bp_conf, "show_dev_menu", &show_dev_menu);
     (void) conf_get_str(bp_conf, "radio_device", &radio_dev);
     (void) conf_get_str(bp_conf, "sound_device", &sound_dev);
 
@@ -384,15 +383,11 @@ create_main_window(void) {
     checkbox_t *sound_out = sound_checkboxes_init(_("Sound output device"),
                                                   &buttons.sound_devs, &buttons.num_sound_devs,
                                                   &buttons.sound_boxes, &buttons.num_sound_boxes);
-    checkbox_t other[5] = {
+    checkbox_t other[4] = {
             {_("Miscellaneous"), NULL, NULL},
             {
              _("Auto disconnect when done"),
                     &buttons.disco_when_done, disco_when_done_tooltip
-            },
-            {
-             _("Show developer menu"),
-                    &buttons.show_dev_menu,   dev_menu_tooltip
             },
             {
              _("Hide default X-Plane 11 tug"),
@@ -401,8 +396,8 @@ create_main_window(void) {
             {NULL,               NULL, NULL}
     };
 
-    if (bp_xp_ver < 11000)
-        other[3] = (checkbox_t) {NULL, NULL, NULL};
+    if ((bp_xp_ver < 11000) || (bp_xp_ver >= 12000)) //Feature only for Xp11
+        other[2 ] = (checkbox_t) {NULL, NULL, NULL};
 
     col1_width = measure_checkboxes_width(col1);
     col2_width = measure_checkboxes_width(col2);
@@ -504,9 +499,9 @@ bp_conf_save(void) {
 
     if ((!file_exists(path, &isdir) || !isdir) &&
         !create_directory_recursive(path)) {
-        free(path);
         logMsg(BP_ERROR_LOG "error writing configuration: "
                             "can't create parent directory %s", path);
+        free(path);
         return (B_FALSE);
     }
     free(path);
