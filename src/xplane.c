@@ -755,7 +755,7 @@ bp_priv_enable(void) {
 
     /* If the user OK'd it, remove the default tug */
     (void) conf_get_b(bp_conf, "dont_hide_xp11_tug", &dont_hide_xp_tug);
-    if (!dont_hide_xp_tug && bp_xp_ver >= 11000)
+    if ((!dont_hide_xp_tug) && (bp_xp_ver >= 11000) && (bp_xp_ver < 12000))
         set_xp11_tug_hidden(B_TRUE);
 
     inited = B_TRUE;

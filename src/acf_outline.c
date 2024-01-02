@@ -35,7 +35,7 @@
             sizeof (path)); \
         str = acf_prop_find(acf, path); \
         if (str == NULL) { \
-            logMsg(BP_ERROR_LOG "Error parsing acf file: property %s not found",\
+            logMsg(BP_INFO_LOG "Cannot parse acf file: property %s not found, aircraft outline may not well drawn",\
                 path); \
             goto errout; \
         } \
