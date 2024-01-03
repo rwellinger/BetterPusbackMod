@@ -170,6 +170,8 @@ bp_long_state_t bp_ls = {0};
 static bool_t inited = B_FALSE;
 static XPLMFlightLoopID bp_floop = NULL;
 
+static bool_t cfg_disco_when_done = B_FALSE;
+
 static bool_t read_acf_file_info(void);
 
 static float bp_run(float elapsed, float elapsed2, int counter, void *refcon);
@@ -1037,7 +1039,7 @@ bool_t
 bp_init(void) {
     const char *reason;
     dr_t radio_vol, sound_on;
-    char my_acf[512], my_path[512];
+    char my_acf[512], my_path[512], key[530];
     char *acf_override_file;
 
     /*
@@ -1151,6 +1153,16 @@ bp_init(void) {
 
     XPLMGetNthAircraftModel(0, my_acf, my_path);
 
+    cfg_disco_when_done = B_FALSE;
+    // checking for setting linked to the aircraft, if not found
+    // fallback to the general setting
+    snprintf(key, sizeof(key),
+                 "disco_when_done_%s",my_acf);
+    if (!conf_get_b(bp_conf, key,
+                                &cfg_disco_when_done)) {
+        (void) conf_get_b(bp_conf, "disco_when_done",
+                                &cfg_disco_when_done);
+    }
     acf_override_file  = mkpathname(bp_xpdir, bp_plugindir, "objects", "override", my_acf, NULL);
     if (file_exists(acf_override_file, NULL)) {
         logMsg(BP_INFO_LOG "acf override file found in %s : using it  ", acf_override_file);
@@ -1766,7 +1778,6 @@ pb_step_connect_winch(void) {
     }
 
     if (!slave_mode) {
-        /* When grabbing, keep the aircraft firmly in place */
         brakes_set(B_FALSE);
     }
 
@@ -2023,8 +2034,9 @@ pb_step_stopped(void) {
         push_at_speed(0, bp.veh.max_accel, B_FALSE, B_FALSE);
         brakes_set(B_TRUE);
     }
-    if (!pbrake_is_set()) {
+    if (!pbrake_is_set() && !cfg_disco_when_done) {
         /*
+         * Ignoring Brake status if disco_when_done is set
          * Keep resetting the start time to enforce a delay
          * when the parking brake is set.
          */
@@ -2337,11 +2349,7 @@ static void
 pb_step_waiting4ok2disco(void) {
     if (!bp.ok2disco) {
         if (bp_ls.disco_win == NULL && !slave_mode) {
-            bool_t disco_when_done = B_FALSE;
-
-            (void) conf_get_b(bp_conf, "disco_when_done",
-                              &disco_when_done);
-            if (disco_when_done) {
+            if (cfg_disco_when_done) {
                 /*
                  * Don't actually show the interface, just
                  * fire the disconnection command.

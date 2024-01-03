@@ -103,7 +103,8 @@ const char *dev_menu_tooltip = "Show the developer menu options.";
 const char *save_prefs_tooltip = "Save current preferences to disk.";
 const char *disco_when_done_tooltip =
         "Never ask and always automatically disconnect\n"
-        "the tug when the pushback operation is complete.";
+        "the tug when the pushback operation is complete\n"
+        "(Parking brake check will be by-passed)";
 const char *hide_xp11_tug_tooltip =
         "Hides default X-Plane 11 pushback tug.\n"
         "Restart X-Plane for this change to take effect.";
