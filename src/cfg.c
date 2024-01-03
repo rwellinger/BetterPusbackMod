@@ -509,7 +509,7 @@ bp_conf_save(void) {
     path = mkpathname(CONF_DIRS, CONF_FILENAME, NULL);
     fp = fopen(path, "wb");
 
-    if (fp != NULL && (conf_write(bp_conf, fp) >= 0)) {
+    if (fp != NULL && (conf_write(bp_conf, fp))) {
         logMsg(BP_INFO_LOG "Write config file %s", path);
         res = B_TRUE;
     } else {
