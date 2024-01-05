@@ -603,30 +603,42 @@ void key_sanity(char *key) {
 
 bool_t
 conf_get_disco_when_done(char *my_acf, bool_t *value) {
-    char key[512];
     if ( my_acf == NULL ) {
         return conf_get_b(bp_conf, "disco_when_done",
                                 value);
     } 
     else {
-        snprintf(key, sizeof(key),
-                 "disco_when_done_%s",my_acf);
+        int l;
+        bool_t result;
+        char *key;
+        l = snprintf(NULL, 0,
+                "disco_when_done_%s",my_acf);
+        key = safe_malloc(l + 1);
+        snprintf(key, l+1,
+                "disco_when_done_%s",my_acf);
         key_sanity(key);         
-        return conf_get_b(bp_conf, key, value);         
+        result = conf_get_b(bp_conf, key, value);
+        free(key);  
+        return result;         
     }
 }
 
 void
 conf_set_disco_when_done(char *my_acf, bool_t value) {
-    char key[512];
     if ( my_acf == NULL ) {
         (void) conf_set_b(bp_conf, "disco_when_done",
                                 value);
     } 
     else {
-        snprintf(key, sizeof(key),
+        int l;
+        char *key;
+        l = snprintf(NULL, 0,
+                "disco_when_done_%s",my_acf);
+        key = safe_malloc(l + 1);
+        snprintf(key, l+1,
                 "disco_when_done_%s",my_acf);
         key_sanity(key); 
-        conf_set_b(bp_conf, key, value);         
+        conf_set_b(bp_conf, key, value);
+        free(key);         
     }
 }
