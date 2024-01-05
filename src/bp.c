@@ -1039,7 +1039,7 @@ bool_t
 bp_init(void) {
     const char *reason;
     dr_t radio_vol, sound_on;
-    char my_acf[512], my_path[512], key[530];
+    char my_acf[512], my_path[512];
     char *acf_override_file;
 
     /*
@@ -1154,15 +1154,16 @@ bp_init(void) {
     XPLMGetNthAircraftModel(0, my_acf, my_path);
 
     cfg_disco_when_done = B_FALSE;
-    // checking for setting linked to the aircraft, if not found
-    // fallback to the general setting
-    snprintf(key, sizeof(key),
-                 "disco_when_done_%s",my_acf);
-    if (!conf_get_b(bp_conf, key,
-                                &cfg_disco_when_done)) {
-        (void) conf_get_b(bp_conf, "disco_when_done",
-                                &cfg_disco_when_done);
+    if (!conf_get_disco_when_done(my_acf, &cfg_disco_when_done)) {
+        // checking for setting linked to the aircraft, if not found
+        // fallback to the general setting
+        //logMsg(BP_INFO_LOG "'disco_when_done_%s' setting not found getting general setting", my_acf );
+        conf_get_disco_when_done(NULL, &cfg_disco_when_done);
+        //logMsg(BP_INFO_LOG "get 'disco_when_done' %s", (cfg_disco_when_done ? "True" : "False") );
+    } else {
+        //logMsg(BP_INFO_LOG "get 'disco_when_done_%s' %s", my_acf, (cfg_disco_when_done ? "True" : "False") );
     }
+    
     acf_override_file  = mkpathname(bp_xpdir, bp_plugindir, "objects", "override", my_acf, NULL);
     if (file_exists(acf_override_file, NULL)) {
         logMsg(BP_INFO_LOG "acf override file found in %s : using it  ", acf_override_file);

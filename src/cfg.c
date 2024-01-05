@@ -22,6 +22,7 @@
 #include <XPLMGraphics.h>
 #include <XPWidgets.h>
 #include <XPStandardWidgets.h>
+#include <XPLMPlanes.h>
 
 #include <acfutils/assert.h>
 #include <acfutils/helpers.h>
@@ -112,13 +113,25 @@ const char *hide_xp11_tug_tooltip =
 static void
 buttons_update(void) {
     const char *lang = "XX";
+    char my_acf[512], my_path[512];
     lang_pref_t lang_pref;
     bool_t disco_when_done = B_FALSE;
     bool_t show_dev_menu = B_FALSE;
     const char *radio_dev = "", *sound_dev = "";
 
     (void) conf_get_str(bp_conf, "lang", &lang);
-    (void) conf_get_b(bp_conf, "disco_when_done", &disco_when_done);
+    XPLMGetNthAircraftModel(0, my_acf, my_path);
+    //(void) conf_get_b(bp_conf, "disco_when_done", &disco_when_done);
+    if (!conf_get_disco_when_done(my_acf, &disco_when_done)) {
+        // checking for setting linked to the aircraft, if not found
+        // fallback to the general setting
+        //logMsg(BP_INFO_LOG "'disco_when_done_%s' setting not found getting general setting", my_acf );
+        conf_get_disco_when_done(NULL, &disco_when_done);
+        //ogMsg(BP_INFO_LOG "get 'disco_when_done' %s", (disco_when_done ? "True" : "False") );
+    } else {
+        //logMsg(BP_INFO_LOG "get 'disco_when_done_%s' %s", my_acf, (disco_when_done ? "True" : "False") );
+    }
+
     //(void) conf_get_b(bp_conf, "show_dev_menu", &show_dev_menu);
     (void) conf_get_str(bp_conf, "radio_device", &radio_dev);
     (void) conf_get_str(bp_conf, "sound_device", &sound_dev);
@@ -214,9 +227,13 @@ main_window_cb(XPWidgetMessage msg, XPWidgetID widget, intptr_t param1,
             conf_set_i(bp_conf, "lang_pref",
                        LANG_PREF_MATCH_ENGLISH);
         } else if (btn == buttons.disco_when_done) {
-            conf_set_b(bp_conf, "disco_when_done",
-                       XPGetWidgetProperty(buttons.disco_when_done,
+            char my_acf[512], my_path[512];
+            XPLMGetNthAircraftModel(0, my_acf, my_path);
+            conf_set_disco_when_done(my_acf, XPGetWidgetProperty(buttons.disco_when_done,
                                            xpProperty_ButtonState, NULL));
+            //conf_set_b(bp_conf, "disco_when_done",
+            //           XPGetWidgetProperty(buttons.disco_when_done,
+            //                               xpProperty_ButtonState, NULL));
         } else if (btn == buttons.show_dev_menu) {
             conf_set_b(bp_conf, "show_dev_menu",
                        XPGetWidgetProperty(buttons.show_dev_menu,
@@ -387,7 +404,7 @@ create_main_window(void) {
     checkbox_t other[4] = {
             {_("Miscellaneous"), NULL, NULL},
             {
-             _("Auto disconnect when done"),
+             _("Auto disconnect when done **"),
                     &buttons.disco_when_done, disco_when_done_tooltip
             },
             {
@@ -442,6 +459,12 @@ create_main_window(void) {
     LAYOUT_PUSH_BUTTON(save_cfg, (main_window_width - BUTTON_WIDTH) / 2,
                        MAIN_WINDOW_HEIGHT - MARGIN, BUTTON_WIDTH, BUTTON_HEIGHT,
                        _("Save preferences"), save_prefs_tooltip);
+
+    create_widget_rel( MARGIN ,
+	    MAIN_WINDOW_HEIGHT - 49, B_FALSE,
+	    main_window_width - 4 * MARGIN,
+	    BUTTON_HEIGHT, 1, "** Settings related to the current aircraft", 0, main_win,
+	    xpWidgetClass_Caption);                   
 
     free_checkboxes(radio_out);
     free_checkboxes(sound_out);
@@ -510,14 +533,6 @@ bp_conf_save(void) {
     path = mkpathname(CONF_DIRS, CONF_FILENAME, NULL);
     fp = fopen(path, "wb");
 
-    if (fp != NULL && (conf_write(bp_conf, fp))) {
-        logMsg(BP_INFO_LOG "Write config file %s", path);
-        res = B_TRUE;
-    } else {
-        logMsg(BP_ERROR_LOG "Error writing configuration %s: %s", path,
-               strerror(errno));
-    }
-
     if (fp != NULL) {
         if (conf_write(bp_conf, fp)) {
             logMsg(BP_INFO_LOG "Write config file %s", path);
@@ -569,5 +584,49 @@ bp_conf_open(void) {
     ASSERT(inited);
     if (main_win == NULL)
         gui_init();
+    else
+        buttons_update(); // again here as we may change to an other aircraft without relauching X-plane 
     XPShowWidget(main_win);
+}
+
+
+void key_sanity(char *key) {
+    int i;
+    for(i=0;key[i]!='\0';i++)
+        {
+        if ((key[i]==' ') || (key[i]=='.'))
+        {
+            key[i] = '_';
+        }
+        }
+}
+
+bool_t
+conf_get_disco_when_done(char *my_acf, bool_t *value) {
+    char key[512];
+    if ( my_acf == NULL ) {
+        return conf_get_b(bp_conf, "disco_when_done",
+                                value);
+    } 
+    else {
+        snprintf(key, sizeof(key),
+                 "disco_when_done_%s",my_acf);
+        key_sanity(key);         
+        return conf_get_b(bp_conf, key, value);         
+    }
+}
+
+void
+conf_set_disco_when_done(char *my_acf, bool_t value) {
+    char key[512];
+    if ( my_acf == NULL ) {
+        (void) conf_set_b(bp_conf, "disco_when_done",
+                                value);
+    } 
+    else {
+        snprintf(key, sizeof(key),
+                "disco_when_done_%s",my_acf);
+        key_sanity(key); 
+        conf_set_b(bp_conf, key, value);         
+    }
 }
