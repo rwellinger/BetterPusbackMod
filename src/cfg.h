@@ -37,6 +37,10 @@ void bp_conf_set_save_enabled(bool_t flag);
 
 void bp_conf_open(void);
 
+bool_t conf_get_disco_when_done(char *my_acf, bool_t *value);
+
+void conf_set_disco_when_done(char *my_acf, bool_t value);
+
 #ifdef    __cplusplus
 }
 #endif
