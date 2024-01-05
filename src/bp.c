@@ -223,6 +223,10 @@ max_steer_angle(void) {
 static bool_t
 pbrake_is_set(void) {
     bool_t result;
+    
+    if(slave_mode && pb_set_override) 
+        return pb_set_remote;
+
     if (drs.pbrake_is_custom) {
         result = (dr_getf(&drs.pbrake) != 0);
     } else {
