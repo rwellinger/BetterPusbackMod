@@ -473,11 +473,24 @@ draw_segment(const seg_t *seg) {
             float h1, h2;
             vect2_t wing_l, wing_r, p;
 
-            VERIFY3U(XPLMProbeTerrainXYZ(probe, seg->start_pos.x, 0,
-                                         -seg->start_pos.y, &info), ==, xplm_ProbeHitTerrain);
+            //VERIFY3U(XPLMProbeTerrainXYZ(probe, seg->start_pos.x, 0,
+            //                             -seg->start_pos.y, &info), ==, xplm_ProbeHitTerrain);
+            if (XPLMProbeTerrainXYZ(probe, seg->start_pos.x, 0,
+                                         -seg->start_pos.y, &info) != xplm_ProbeHitTerrain) {
+                    logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+                    XPLMDestroyProbe(probe);
+                    return ;
+            }        
+
             h1 = info.locationY;
-            VERIFY3U(XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
-                                         -seg->end_pos.y, &info), ==, xplm_ProbeHitTerrain);
+            //VERIFY3U(XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
+            //                             -seg->end_pos.y, &info), ==, xplm_ProbeHitTerrain);
+            if (XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
+                                         -seg->end_pos.y, &info) != xplm_ProbeHitTerrain) {
+                    logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+                    XPLMDestroyProbe(probe);
+                    return ;
+            }        
             h2 = info.locationY;
 
             glColor3f(0, 0, 1);
@@ -530,9 +543,15 @@ draw_segment(const seg_t *seg) {
                 p1 = vect2_add(c, vect2_rot(c2s, a));
                 p2 = vect2_add(c, vect2_rot(c2s, a + step));
 
-                VERIFY3U(XPLMProbeTerrainXYZ(probe, p1.x, 0, -p1.y,
-                                             &info), ==, xplm_ProbeHitTerrain);
+                //VERIFY3U(XPLMProbeTerrainXYZ(probe, p1.x, 0, -p1.y,
+                //                             &info), ==, xplm_ProbeHitTerrain);
 
+                if (XPLMProbeTerrainXYZ(probe, p1.x, 0, -p1.y,
+                                             &info) != xplm_ProbeHitTerrain) {
+                        logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+                        XPLMDestroyProbe(probe);
+                        return ;
+                }        
                 glColor3f(0, 0, 1);
                 glLineWidth(3);
                 glBegin(GL_LINES);
@@ -670,8 +689,16 @@ draw_prediction(XPLMDrawingPhase phase, int before, void *refcon) {
         vect2_t dir_v = hdg2dir(seg->end_hdg);
         vect2_t x;
 
-        VERIFY3U(XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
-                                     -seg->end_pos.y, &info), ==, xplm_ProbeHitTerrain);
+        //VERIFY3U(XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
+        //                             -seg->end_pos.y, &info), ==, xplm_ProbeHitTerrain);
+
+        if (XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
+                                     -seg->end_pos.y, &info)) {
+        logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+        XPLMDestroyProbe(probe);
+        return (1);
+        }        
+
         if (seg->type == SEG_TYPE_TURN || !seg->backward) {
             glBegin(GL_LINES);
             glColor3f(0, 1, 0);
@@ -695,22 +722,40 @@ draw_prediction(XPLMDrawingPhase phase, int before, void *refcon) {
         draw_acf_symbol(VECT3(seg->end_pos.x, info.locationY,
                               seg->end_pos.y), seg->end_hdg, AMBER_TUPLE);
     } else {
-        VERIFY3U(XPLMProbeTerrainXYZ(probe, cursor_world_pos.x, 0,
-                                     -cursor_world_pos.y, &info), ==, xplm_ProbeHitTerrain);
+        //VERIFY3U(XPLMProbeTerrainXYZ(probe, cursor_world_pos.x, 0,
+        //                             -cursor_world_pos.y, &info), ==, xplm_ProbeHitTerrain);
+        if (XPLMProbeTerrainXYZ(probe, cursor_world_pos.x, 0,
+                                     -cursor_world_pos.y, &info)) {
+        logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+        XPLMDestroyProbe(probe);
+        return (1);
+        }                                             
         draw_acf_symbol(VECT3(cursor_world_pos.x, info.locationY,
                               cursor_world_pos.y), cursor_hdg, RED_TUPLE);
     }
 
     if ((seg = list_tail(&bp.segs)) != NULL) {
-        VERIFY3U(XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
-                                     -seg->end_pos.y, &info), ==, xplm_ProbeHitTerrain);
+        //VERIFY3U(XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
+        //                             -seg->end_pos.y, &info), ==, xplm_ProbeHitTerrain);
+        if (XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
+                                     -seg->end_pos.y, &info)) {
+        logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+        XPLMDestroyProbe(probe);
+        return (1);
+        }   
         draw_acf_symbol(VECT3(seg->end_pos.x, info.locationY,
                               seg->end_pos.y), seg->end_hdg, GREEN_TUPLE);
     }
 
     /* Draw the night-lighting lamp so the user can see under the cursor */
-    VERIFY3U(XPLMProbeTerrainXYZ(probe, cursor_world_pos.x, 0,
-                                 -cursor_world_pos.y, &info), ==, xplm_ProbeHitTerrain);
+    //VERIFY3U(XPLMProbeTerrainXYZ(probe, cursor_world_pos.x, 0,
+    //                             -cursor_world_pos.y, &info), ==, xplm_ProbeHitTerrain);
+    if (XPLMProbeTerrainXYZ(probe, cursor_world_pos.x, 0,
+                                 -cursor_world_pos.y, &info)) {
+    logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+    XPLMDestroyProbe(probe);
+    return (1);
+    }   
     di.structSize = sizeof(di);
     di.x = cursor_world_pos.x;
     di.y = info.locationY;
