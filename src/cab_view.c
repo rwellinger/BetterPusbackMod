@@ -149,8 +149,16 @@ cam_ctl(XPLMCameraPosition_t *pos, int losing_control, void *refcon)
 	}
 
 	probe = XPLMCreateProbe(xplm_ProbeY);
-	VERIFY3U(XPLMProbeTerrainXYZ(probe, bp_ls.tug->pos.pos.x, 0,
-	    -bp_ls.tug->pos.pos.y, &info), ==, xplm_ProbeHitTerrain);
+	//VERIFY3U(XPLMProbeTerrainXYZ(probe, bp_ls.tug->pos.pos.x, 0,
+	//    -bp_ls.tug->pos.pos.y, &info), ==, xplm_ProbeHitTerrain);
+
+	if (XPLMProbeTerrainXYZ(probe, bp_ls.tug->pos.pos.x, 0,
+	    -bp_ls.tug->pos.pos.y, &info)) {
+    logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+    XPLMDestroyProbe(probe);
+    return (1);
+    }   
+
 	/* Must be upright, no driving on ceilings! */
 	ASSERT3F(info.normalY, >, 0.0);
 

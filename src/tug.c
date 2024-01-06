@@ -1570,8 +1570,14 @@ tug_draw(tug_t *tug, double cur_t) {
     probe = XPLMCreateProbe(xplm_ProbeY);
 
     /* X-Plane's Z axis is inverted to ours */
-    VERIFY3U(XPLMProbeTerrainXYZ(probe, tug->pos.pos.x, 0,
-                                 -tug->pos.pos.y, &info), ==, xplm_ProbeHitTerrain);
+    //VERIFY3U(XPLMProbeTerrainXYZ(probe, tug->pos.pos.x, 0,
+    //                            -tug->pos.pos.y, &info), ==, xplm_ProbeHitTerrain);
+    if (XPLMProbeTerrainXYZ(probe, tug->pos.pos.x, 0,
+                                 -tug->pos.pos.y, &info) != xplm_ProbeHitTerrain) {
+        logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+        XPLMDestroyProbe(probe);
+    return ;
+    }                             
 
     pos = VECT3(tug->pos.pos.x, info.locationY, -tug->pos.pos.y);
     norm = VECT3(info.normalX, info.normalY, info.normalZ);

@@ -728,13 +728,29 @@ seg_local2world(seg_t *seg) {
     probe = XPLMCreateProbe(xplm_ProbeY);
 
     /* X-Plane's Z axis is flipped to ours */
-    VERIFY3U(XPLMProbeTerrainXYZ(probe, seg->start_pos.x, 0,
-                                 -seg->start_pos.y, &info), ==, xplm_ProbeHitTerrain);
+    //VERIFY3U(XPLMProbeTerrainXYZ(probe, seg->start_pos.x, 0,
+    //                             -seg->start_pos.y, &info), ==, xplm_ProbeHitTerrain);
+
+	if (XPLMProbeTerrainXYZ(probe, seg->start_pos.x, 0,
+                                 -seg->start_pos.y, &info)) {
+    logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+    XPLMDestroyProbe(probe);
+    return;
+    }   
+
     XPLMLocalToWorld(seg->start_pos.x, info.locationY, -seg->start_pos.y,
                      &seg->start_pos_geo.lat, &seg->start_pos_geo.lon, &unused);
 
-    VERIFY3U(XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
-                                 -seg->end_pos.y, &info), ==, xplm_ProbeHitTerrain);
+    //VERIFY3U(XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
+    //                             -seg->end_pos.y, &info), ==, xplm_ProbeHitTerrain);
+
+	if (XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
+                                 -seg->end_pos.y, &info)) {
+    logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+    XPLMDestroyProbe(probe);
+    return;
+    }   
+
     XPLMLocalToWorld(seg->end_pos.x, info.locationY, -seg->end_pos.y,
                      &seg->end_pos_geo.lat, &seg->end_pos_geo.lon, &unused);
 
