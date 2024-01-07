@@ -40,11 +40,11 @@ https://github.com/rwellinger/BetterPusbackMod/releases
 
 (Please be aware that the pre release maybe still has some issues inside and maybe is not final tested.)
 
-## Support if you like what I did:
+## Support if you like what we did:
 
 https://www.paypal.com/donate/?hosted_button_id=NGZPRYALBDJU4
 
-(Please note that this plugin will remain free.)
+(Please note that this plugin will remain open-source.)
 
 
 ## Building BetterPushback
