@@ -51,12 +51,12 @@ static XPWidgetID main_win = NULL;
 
 #define    MAIN_WINDOW_HEIGHT    (MARGIN + 16 * BUTTON_HEIGHT + MARGIN)
 
-#define	COPYRIGHT1	"BetterPushback " BP_PLUGIN_VERSION \
-	"       Copyright 2017 S.Kiselkov, Modified RobWell 2024. All rights reserved."
-#define	COPYRIGHT2	"BetterPushback is open-source software. See COPYING for " \
-			"more information."
-#define	TOOLTIP_HINT	"Hint: hover your mouse cursor over any knob to " \
-			"show a short description of what it does."
+#define    COPYRIGHT1    "BetterPushback " BP_PLUGIN_VERSION \
+    "       Copyright 2017 S.Kiselkov, Modified RobWell 2024. All rights reserved."
+#define    COPYRIGHT2    "BetterPushback is open-source software. See COPYING for " \
+            "more information."
+#define    TOOLTIP_HINT    "Hint: hover your mouse cursor over any knob to " \
+            "show a short description of what it does."
 
 static struct {
     XPWidgetID chinese;
@@ -237,7 +237,7 @@ main_window_cb(XPWidgetMessage msg, XPWidgetID widget, intptr_t param1,
             char my_acf[512], my_path[512];
             XPLMGetNthAircraftModel(0, my_acf, my_path);
             conf_set_disco_when_done(my_acf, XPGetWidgetProperty(buttons.disco_when_done,
-                                           xpProperty_ButtonState, NULL));
+                                                                 xpProperty_ButtonState, NULL));
             //conf_set_b(bp_conf, "disco_when_done",
             //           XPGetWidgetProperty(buttons.disco_when_done,
             //                               xpProperty_ButtonState, NULL));
@@ -422,7 +422,7 @@ create_main_window(void) {
     };
 
     if ((bp_xp_ver < 11000) || (bp_xp_ver >= 12000)) //Feature only for Xp11
-        other[2 ] = (checkbox_t) {NULL, NULL, NULL};
+        other[2] = (checkbox_t) {NULL, NULL, NULL};
 
     col1_width = measure_checkboxes_width(col1);
     col2_width = measure_checkboxes_width(col2);
@@ -431,11 +431,9 @@ create_main_window(void) {
     main_window_width = 4 * MARGIN + col1_width + col2_width +
                         MAX(col3_width, col4_width);
 
-    l = snprintf(NULL, 0, "%s (%s)",
-                 _("BetterPushback Preferences"), BP_PLUGIN_VERSION);
+    l = snprintf(NULL, 0, "%s", _("BetterPushback Preferences"));
     prefs_title = safe_malloc(l + 1);
-    snprintf(prefs_title, l + 1, "%s (%s)",
-             _("BetterPushback Preferences"), BP_PLUGIN_VERSION);
+    snprintf(prefs_title, l + 1, "%s", _("BetterPushback Preferences"));
     main_win = create_widget_rel(100, 100, B_FALSE, main_window_width,
                                  MAIN_WINDOW_HEIGHT, 0, prefs_title, 1, NULL,
                                  xpWidgetClass_MainWindow);
@@ -469,28 +467,28 @@ create_main_window(void) {
 
     const int MAIN_WINDOW_SPACE = 25;
 
-    create_widget_rel(MARGIN ,
+    create_widget_rel(MARGIN,
                       MAIN_WINDOW_HEIGHT - 101 - (MAIN_WINDOW_SPACE + 10), B_FALSE,
-	    main_window_width - 4 * MARGIN,
+                      main_window_width - 4 * MARGIN,
                       BUTTON_HEIGHT, 1, "** Settings related to the current aircraft", 0, main_win,
                       xpWidgetClass_Caption);
 
-    create_widget_rel( MARGIN ,
-	    MAIN_WINDOW_HEIGHT - 75 - MAIN_WINDOW_SPACE, B_FALSE,
-	    main_window_width - 4 * MARGIN,
-	    BUTTON_HEIGHT, 1, COPYRIGHT1, 0, main_win,
-	    xpWidgetClass_Caption);                   
-    create_widget_rel( MARGIN ,
-	    MAIN_WINDOW_HEIGHT - 62 - MAIN_WINDOW_SPACE, B_FALSE,
-	    main_window_width - 4 * MARGIN,
-	    BUTTON_HEIGHT, 1, COPYRIGHT2, 0, main_win,
-	    xpWidgetClass_Caption);                   
-    create_widget_rel( MARGIN ,
-        MAIN_WINDOW_HEIGHT - 49 - (MAIN_WINDOW_SPACE - 10), B_FALSE,
-        main_window_width - 4 * MARGIN,
-        BUTTON_HEIGHT, 1, TOOLTIP_HINT, 0, main_win,
-        xpWidgetClass_Caption);   
-                        
+    create_widget_rel(MARGIN,
+                      MAIN_WINDOW_HEIGHT - 75 - MAIN_WINDOW_SPACE, B_FALSE,
+                      main_window_width - 4 * MARGIN,
+                      BUTTON_HEIGHT, 1, COPYRIGHT1, 0, main_win,
+                      xpWidgetClass_Caption);
+    create_widget_rel(MARGIN,
+                      MAIN_WINDOW_HEIGHT - 62 - MAIN_WINDOW_SPACE, B_FALSE,
+                      main_window_width - 4 * MARGIN,
+                      BUTTON_HEIGHT, 1, COPYRIGHT2, 0, main_win,
+                      xpWidgetClass_Caption);
+    create_widget_rel(MARGIN,
+                      MAIN_WINDOW_HEIGHT - 49 - (MAIN_WINDOW_SPACE - 10), B_FALSE,
+                      main_window_width - 4 * MARGIN,
+                      BUTTON_HEIGHT, 1, TOOLTIP_HINT, 0, main_win,
+                      xpWidgetClass_Caption);
+
     free_checkboxes(radio_out);
     free_checkboxes(sound_out);
 }
@@ -617,53 +615,49 @@ bp_conf_open(void) {
 
 void key_sanity(char *key) {
     int i;
-    for(i=0;key[i]!='\0';i++)
-        {
-        if ((key[i]==' ') || (key[i]=='.'))
-        {
+    for (i = 0; key[i] != '\0'; i++) {
+        if ((key[i] == ' ') || (key[i] == '.')) {
             key[i] = '_';
         }
-        }
+    }
 }
 
 bool_t
 conf_get_disco_when_done(char *my_acf, bool_t *value) {
-    if ( my_acf == NULL ) {
+    if (my_acf == NULL) {
         return conf_get_b(bp_conf, "disco_when_done",
-                                value);
-    } 
-    else {
+                          value);
+    } else {
         int l;
         bool_t result;
         char *key;
         l = snprintf(NULL, 0,
-                "disco_when_done_%s",my_acf);
+                     "disco_when_done_%s", my_acf);
         key = safe_malloc(l + 1);
-        snprintf(key, l+1,
-                "disco_when_done_%s",my_acf);
-        key_sanity(key);         
+        snprintf(key, l + 1,
+                 "disco_when_done_%s", my_acf);
+        key_sanity(key);
         result = conf_get_b(bp_conf, key, value);
-        free(key);  
-        return result;         
+        free(key);
+        return result;
     }
 }
 
 void
 conf_set_disco_when_done(char *my_acf, bool_t value) {
-    if ( my_acf == NULL ) {
+    if (my_acf == NULL) {
         (void) conf_set_b(bp_conf, "disco_when_done",
-                                value);
-    } 
-    else {
+                          value);
+    } else {
         int l;
         char *key;
         l = snprintf(NULL, 0,
-                "disco_when_done_%s",my_acf);
+                     "disco_when_done_%s", my_acf);
         key = safe_malloc(l + 1);
-        snprintf(key, l+1,
-                "disco_when_done_%s",my_acf);
-        key_sanity(key); 
+        snprintf(key, l + 1,
+                 "disco_when_done_%s", my_acf);
+        key_sanity(key);
         conf_set_b(bp_conf, key, value);
-        free(key);         
+        free(key);
     }
 }
