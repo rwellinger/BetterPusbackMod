@@ -52,7 +52,7 @@ static XPWidgetID main_win = NULL;
 #define    MAIN_WINDOW_HEIGHT    (MARGIN + 16 * BUTTON_HEIGHT + MARGIN)
 
 #define	COPYRIGHT1	"BetterPushback " BP_PLUGIN_VERSION \
-	"       Copyright 2017 Saso Kiselkov. All rights reserved."
+	"       Copyright 2017 S.Kiselkov, Modified RobWell 2024. All rights reserved."
 #define	COPYRIGHT2	"BetterPushback is open-source software. See COPYING for " \
 			"more information."
 #define	TOOLTIP_HINT	"Hint: hover your mouse cursor over any knob to " \
@@ -467,24 +467,26 @@ create_main_window(void) {
                        MAIN_WINDOW_HEIGHT - MARGIN, BUTTON_WIDTH, BUTTON_HEIGHT,
                        _("Save preferences"), save_prefs_tooltip);
 
-    create_widget_rel( MARGIN ,
-	    MAIN_WINDOW_HEIGHT - 101, B_FALSE,
+    const int MAIN_WINDOW_SPACE = 25;
+
+    create_widget_rel(MARGIN ,
+                      MAIN_WINDOW_HEIGHT - 101 - (MAIN_WINDOW_SPACE + 10), B_FALSE,
 	    main_window_width - 4 * MARGIN,
-	    BUTTON_HEIGHT, 1, "** Settings related to the current aircraft", 0, main_win,
-	    xpWidgetClass_Caption);                   
+                      BUTTON_HEIGHT, 1, "** Settings related to the current aircraft", 0, main_win,
+                      xpWidgetClass_Caption);
 
     create_widget_rel( MARGIN ,
-	    MAIN_WINDOW_HEIGHT - 75, B_FALSE,
+	    MAIN_WINDOW_HEIGHT - 75 - MAIN_WINDOW_SPACE, B_FALSE,
 	    main_window_width - 4 * MARGIN,
 	    BUTTON_HEIGHT, 1, COPYRIGHT1, 0, main_win,
 	    xpWidgetClass_Caption);                   
     create_widget_rel( MARGIN ,
-	    MAIN_WINDOW_HEIGHT - 62, B_FALSE,
+	    MAIN_WINDOW_HEIGHT - 62 - MAIN_WINDOW_SPACE, B_FALSE,
 	    main_window_width - 4 * MARGIN,
 	    BUTTON_HEIGHT, 1, COPYRIGHT2, 0, main_win,
 	    xpWidgetClass_Caption);                   
     create_widget_rel( MARGIN ,
-        MAIN_WINDOW_HEIGHT - 49, B_FALSE,
+        MAIN_WINDOW_HEIGHT - 49 - (MAIN_WINDOW_SPACE - 10), B_FALSE,
         main_window_width - 4 * MARGIN,
         BUTTON_HEIGHT, 1, TOOLTIP_HINT, 0, main_win,
         xpWidgetClass_Caption);   
