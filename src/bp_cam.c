@@ -54,6 +54,7 @@
 #include "bp_cam.h"
 #include "driving.h"
 #include "xplane.h"
+#include "cfg.h"
 
 #define    MAX_PRED_DISTANCE    10000    /* meters */
 #define    ANGLE_DRAW_STEP        5
@@ -341,30 +342,18 @@ move_camera(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
 
 static void
 get_vp(vec4 vp) {
-    int vp_xp[4];
+    int scr_w, scr_h;
 
     ASSERT(vp != NULL);
-
-    if (bp_xp_ver >= 12000) {
-        XPLMGetScreenBoundsGlobal(&vp_xp[0], &vp_xp[3], &vp_xp[2],
-                                  &vp_xp[1]);
-    } else {
-        VERIFY3S(dr_getvi(&drs.viewport, vp_xp, 0, 4), ==, 4);
-    }
-    vp[0] = vp_xp[0];
-    vp[1] = vp_xp[1];
-    vp[2] = vp_xp[2] - vp_xp[0];
-    vp[3] = vp_xp[3] - vp_xp[1];
-    if (vp[2] == 0 || vp[3] == 0) {
-        int scr_w, scr_h;
         /*
-         * Due to an outstanding X-Plane 11.50 beta bug, the viewport
-         * dataref might not be properly updated in OpenGL mode.
+         * As fake_win is defined with 0,0 and sizes given by XPLMGetScreenSize
+         * let's do the same here. it will fix planner drawing in Xp12
          */
         XPLMGetScreenSize(&scr_w, &scr_h);
+        vp[0] = 0;
+        vp[1] = 0;
         vp[2] = scr_w;
         vp[3] = scr_h;
-    }
 }
 
 /*
@@ -1164,6 +1153,8 @@ bp_cam_start(void) {
     }
 #endif    /* !PB_DEBUG_INTF */
 
+    push_reset_fov_values();
+
     XPLMGetScreenSize(&fake_win_ops.right, &fake_win_ops.top);
 
     circle_view_cmd = XPLMFindCommand("sim/view/circle");
@@ -1266,6 +1257,8 @@ bp_cam_stop(void) {
         dr_seti(&drs.use_real_wx, saved_real_wx);
     }
     cam_inited = B_FALSE;
+
+    pop_fov_values();
 
     return (B_TRUE);
 }

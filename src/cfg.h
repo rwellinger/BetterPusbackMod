@@ -25,6 +25,15 @@
 extern "C" {
 #endif
 
+typedef struct {
+    bool_t planner_running;
+    float fov_h_deg;
+    float fov_h_ratio;
+    float fov_roll;
+    float fov_v_deg;
+    float fov_v_ratio;
+} fov_t;
+
 extern conf_t *bp_conf;
 
 bool_t bp_conf_init();
@@ -40,6 +49,10 @@ void bp_conf_open(void);
 bool_t conf_get_disco_when_done(char *my_acf, bool_t *value);
 
 void conf_set_disco_when_done(char *my_acf, bool_t value);
+
+void push_reset_fov_values(void);
+
+void pop_fov_values(void);
 
 #ifdef    __cplusplus
 }

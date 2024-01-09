@@ -25,6 +25,7 @@
 #include <XPLMPlanes.h>
 
 #include <acfutils/assert.h>
+#include <acfutils/dr.h>
 #include <acfutils/helpers.h>
 #include <acfutils/intl.h>
 #include <acfutils/wav.h>
@@ -94,6 +95,18 @@ typedef struct {
     XPWidgetID *widget;
     const char *tooltip;
 } checkbox_t;
+
+static fov_t fov_values = {0};
+static struct {
+    dr_t fov_h_deg;
+    dr_t fov_h_ratio;
+    dr_t fov_roll;
+    dr_t fov_v_deg;
+    dr_t fov_v_ratio;
+} drs;
+
+void get_fov_values_impl(fov_t *values);
+void set_fov_values_impl(fov_t *values);
 
 /* Used to set a null tooltip in the button creation macros. */
 const char *null_tooltip = NULL;
@@ -534,6 +547,13 @@ bp_conf_init(void) {
 
     inited = B_TRUE;
 
+    fdr_find(&drs.fov_h_deg, "sim/graphics/view/field_of_view_horizontal_deg");
+    fdr_find(&drs.fov_h_ratio, "sim/graphics/view/field_of_view_horizontal_ratio");
+    fdr_find(&drs.fov_roll, "sim/graphics/view/field_of_view_roll_deg");
+    fdr_find(&drs.fov_v_deg, "sim/graphics/view/field_of_view_vertical_deg");
+    if (bp_xp_ver >= 12000) // this one only exists in Xp12
+        fdr_find(&drs.fov_v_ratio, "sim/graphics/view/field_of_view_vertical_ratio");
+
     return (B_TRUE);
 }
 
@@ -583,6 +603,8 @@ bp_conf_fini(void) {
     }
     conf_free(bp_conf);
     bp_conf = NULL;
+
+    pop_fov_values();
 
     inited = B_FALSE;
 }
@@ -661,3 +683,54 @@ conf_set_disco_when_done(char *my_acf, bool_t value) {
         free(key);
     }
 }
+
+// Save the fov values ratio,angle
+// they need to be changed during the planner
+void
+push_reset_fov_values(void) {
+    if (fov_values.planner_running) {
+        //logMsg("Getting Fov values: Nothing done, planner already running");
+    }   
+    if (!fov_values.planner_running) {
+        fov_t new_values = {0};
+        get_fov_values_impl(&fov_values);
+        //logMsg("Getting Fov values");
+        fov_values.planner_running = B_TRUE;
+        set_fov_values_impl(&new_values); 
+        //logMsg("Resetting Fov values");
+        }
+ 
+}
+
+void
+get_fov_values_impl(fov_t *values) {
+    values->fov_h_deg = dr_getf(&drs.fov_h_deg);
+    values->fov_h_ratio = dr_getf(&drs.fov_h_ratio);
+    values->fov_roll = dr_getf(&drs.fov_roll);
+    values->fov_v_deg = dr_getf(&drs.fov_v_deg);
+    if (bp_xp_ver >= 12000) // this one only exists in Xp12
+        values->fov_v_ratio = dr_getf(&drs.fov_v_ratio);
+} 
+
+void
+pop_fov_values(void) {
+    if (!fov_values.planner_running) {
+        //logMsg("Restoring Fov values: Nothing done, planner already stopped");
+    }   
+    if (fov_values.planner_running) {
+        set_fov_values_impl(&fov_values);
+        fov_values.planner_running = B_FALSE;
+        //logMsg("Restoring Fov values");
+    }
+ 
+}
+
+void
+set_fov_values_impl(fov_t *values) {
+    dr_setf(&drs.fov_h_deg, values->fov_h_deg);
+    dr_setf(&drs.fov_h_ratio, values->fov_h_ratio);
+    dr_setf(&drs.fov_roll, values->fov_roll);
+    dr_setf(&drs.fov_v_deg, values->fov_v_deg);
+    if (bp_xp_ver >= 12000) // this one only exists in Xp12
+        dr_setf(&drs.fov_v_ratio, values->fov_v_ratio);
+} 
