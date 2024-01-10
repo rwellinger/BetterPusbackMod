@@ -346,10 +346,10 @@ get_vp(vec4 vp) {
 
     ASSERT(vp != NULL);
         /*
-         * As fake_win is defined with 0,0 and sizes given by XPLMGetScreenSize
+         * As fake_win is defined with 0,0 and sizes given by BPGetScreenSizeUIScaled
          * let's do the same here. it will fix planner drawing in Xp12
          */
-        XPLMGetScreenSize(&scr_w, &scr_h);
+        BPGetScreenSizeUIScaled(&scr_w, &scr_h, B_FALSE);
         vp[0] = 0;
         vp[1] = 0;
         vp[2] = scr_w;
@@ -466,7 +466,7 @@ draw_segment(const seg_t *seg) {
             //                             -seg->start_pos.y, &info), ==, xplm_ProbeHitTerrain);
             if (XPLMProbeTerrainXYZ(probe, seg->start_pos.x, 0,
                                          -seg->start_pos.y, &info) != xplm_ProbeHitTerrain) {
-                    logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+                    //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
                     XPLMDestroyProbe(probe);
                     return ;
             }        
@@ -476,7 +476,7 @@ draw_segment(const seg_t *seg) {
             //                             -seg->end_pos.y, &info), ==, xplm_ProbeHitTerrain);
             if (XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
                                          -seg->end_pos.y, &info) != xplm_ProbeHitTerrain) {
-                    logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+                    //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
                     XPLMDestroyProbe(probe);
                     return ;
             }        
@@ -537,7 +537,7 @@ draw_segment(const seg_t *seg) {
 
                 if (XPLMProbeTerrainXYZ(probe, p1.x, 0, -p1.y,
                                              &info) != xplm_ProbeHitTerrain) {
-                        logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+                        //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
                         XPLMDestroyProbe(probe);
                         return ;
                 }        
@@ -683,7 +683,7 @@ draw_prediction(XPLMDrawingPhase phase, int before, void *refcon) {
 
         if (XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
                                      -seg->end_pos.y, &info)) {
-        logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+        //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
         XPLMDestroyProbe(probe);
         return (1);
         }        
@@ -715,7 +715,7 @@ draw_prediction(XPLMDrawingPhase phase, int before, void *refcon) {
         //                             -cursor_world_pos.y, &info), ==, xplm_ProbeHitTerrain);
         if (XPLMProbeTerrainXYZ(probe, cursor_world_pos.x, 0,
                                      -cursor_world_pos.y, &info)) {
-        logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+        //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
         XPLMDestroyProbe(probe);
         return (1);
         }                                             
@@ -728,7 +728,7 @@ draw_prediction(XPLMDrawingPhase phase, int before, void *refcon) {
         //                             -seg->end_pos.y, &info), ==, xplm_ProbeHitTerrain);
         if (XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
                                      -seg->end_pos.y, &info)) {
-        logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+        //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
         XPLMDestroyProbe(probe);
         return (1);
         }   
@@ -741,7 +741,7 @@ draw_prediction(XPLMDrawingPhase phase, int before, void *refcon) {
     //                             -cursor_world_pos.y, &info), ==, xplm_ProbeHitTerrain);
     if (XPLMProbeTerrainXYZ(probe, cursor_world_pos.x, 0,
                                  -cursor_world_pos.y, &info)) {
-    logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+    //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
     XPLMDestroyProbe(probe);
     return (1);
     }   
@@ -820,7 +820,7 @@ fake_win_draw(XPLMWindowID inWindowID, void *inRefcon) {
     UNUSED(inWindowID);
     UNUSED(inRefcon);
 
-    XPLMGetScreenSize(&w, &h);
+    BPGetScreenSizeUIScaled(&w, &h, B_FALSE);
     XPLMSetWindowGeometry(fake_win, 0, h, w, 0);
 
     if (!XPLMIsWindowInFront(fake_win))
@@ -858,7 +858,7 @@ button_hit_check(int x, int y) {
     double scale;
     int w, h, h_buttons, h_off;
 
-    XPLMGetScreenSize(&w, &h);
+    BPGetScreenSizeUIScaled(&w, &h, B_FALSE);
 
     h_buttons = 0;
     for (int i = 0; buttons[i].filename != NULL; i++)
@@ -1155,7 +1155,7 @@ bp_cam_start(void) {
 
     push_reset_fov_values();
 
-    XPLMGetScreenSize(&fake_win_ops.right, &fake_win_ops.top);
+    BPGetScreenSizeUIScaled(&fake_win_ops.right, &fake_win_ops.top, B_TRUE);
 
     circle_view_cmd = XPLMFindCommand("sim/view/circle");
     ASSERT(circle_view_cmd != NULL);

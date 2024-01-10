@@ -31,6 +31,7 @@
 #include <acfutils/widget.h>
 #include <acfutils/time.h>
 
+#include "cfg.h"
 #include "bp.h"
 #include "bp_cam.h"
 #include "cab_view.h"
@@ -154,7 +155,7 @@ cam_ctl(XPLMCameraPosition_t *pos, int losing_control, void *refcon)
 
 	if (XPLMProbeTerrainXYZ(probe, bp_ls.tug->pos.pos.x, 0,
 	    -bp_ls.tug->pos.pos.y, &info)) {
-    logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+    //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
     XPLMDestroyProbe(probe);
     return (1);
     }   
@@ -196,7 +197,7 @@ win_draw(XPLMWindowID inWindowID, void *inRefcon)
 
 	UNUSED(inWindowID);
 	UNUSED(inRefcon);
-	XPLMGetScreenSize(&w, &h);
+	BPGetScreenSizeUIScaled(&w, &h, B_FALSE);
 	XPLMSetWindowGeometry(win, 0, h, w, 0);
 
 	if (hintbar != NULL && microclock() - hintbar_start > HINTBAR_TIMEOUT) {
@@ -338,7 +339,7 @@ cab_view_start(void)
 		    str, strlen(str));
 		XPWidgetID caption;
 
-		XPLMGetScreenSize(&x, &y);
+		BPGetScreenSizeUIScaled(&x, &y, B_TRUE);
 		hintbar = create_widget_rel((x - w) / 2 - 10,
 		    HINTBAR_HEIGHT * 3, B_FALSE, w + 20,
 		    HINTBAR_HEIGHT, 0, "", 1, NULL, xpWidgetClass_MainWindow);
