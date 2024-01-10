@@ -37,6 +37,7 @@
 
 #define    CONF_FILENAME    "BetterPushback.cfg"
 #define    CONF_DIRS    bp_xpdir, "Output", "preferences"
+#define    MISC_FILENAME    "Miscellaneous.prf"
 
 conf_t *bp_conf = NULL;
 
@@ -103,8 +104,16 @@ static struct {
     dr_t fov_roll;
     dr_t fov_v_deg;
     dr_t fov_v_ratio;
+    dr_t ui_scale;
 } drs;
 
+static struct {
+    int ui_scaled; // 0 'scale' not yet initialised; 1 'scale' initialised and UI not scaled (100% ); 2 'scale' initialised and UI scaled (150% or more)
+    float scale;
+} ui_status = {0};
+
+void ui_status_init(void);
+float get_ui_scale_from_pref(void);
 void get_fov_values_impl(fov_t *values);
 void set_fov_values_impl(fov_t *values);
 
@@ -551,9 +560,10 @@ bp_conf_init(void) {
     fdr_find(&drs.fov_h_ratio, "sim/graphics/view/field_of_view_horizontal_ratio");
     fdr_find(&drs.fov_roll, "sim/graphics/view/field_of_view_roll_deg");
     fdr_find(&drs.fov_v_deg, "sim/graphics/view/field_of_view_vertical_deg");
-    if (bp_xp_ver >= 12000) // this one only exists in Xp12
+    if (bp_xp_ver >= 12000) { // these one only exists in Xp12
         fdr_find(&drs.fov_v_ratio, "sim/graphics/view/field_of_view_vertical_ratio");
-
+        fdr_find(&drs.ui_scale, "sim/graphics/misc/user_interface_scale");
+    }
     return (B_TRUE);
 }
 
@@ -734,3 +744,67 @@ set_fov_values_impl(fov_t *values) {
     if (bp_xp_ver >= 12000) // this one only exists in Xp12
         dr_setf(&drs.fov_v_ratio, values->fov_v_ratio);
 } 
+
+void
+ui_status_init(void) {
+    ui_status.ui_scaled = 1;
+    if (bp_xp_ver >= 12000) {
+        ui_status.scale = dr_getf(&drs.ui_scale);
+    } else {
+        // TODO as no datatef available for Xp11
+        // see pixel_multiplier 1.500000 in Miscellaneous.prf
+        ui_status.scale = get_ui_scale_from_pref();
+    }
+    ui_status.ui_scaled = (ui_status.scale > 1.1) ? 2 : 1 ;
+    logMsg("ui_status initialised ui_scaled %d / scale %f",ui_status.ui_scaled, ui_status.scale );
+}
+
+void
+BPGetScreenSizeUIScaled(int *w, int *h, bool_t get_ui_scale) {
+    XPLMGetScreenSize(w, h);
+    //logMsg("Original sizes w %d / h %d", *w, *h);
+    if ((ui_status.ui_scaled == 0 ) || get_ui_scale) {
+        ui_status_init();
+    }
+    if (ui_status.ui_scaled == 2 ) {
+        *w = (int)((double) *w / ui_status.scale );
+        *h = (int)((double) *h / ui_status.scale );
+        logMsg("Rescaled sizes w %d / h %d with %f",*w, *h, ui_status.scale );
+    }
+}
+
+float
+get_ui_scale_from_pref(void) {
+    char *path = mkpathname(CONF_DIRS, MISC_FILENAME, NULL);
+    const char *key = "pixel_multiplier";
+    float scale = 1.0;
+	FILE *fp = fopen(path, "rb");
+	char *line = NULL;
+    char *search ;
+	size_t cap = 0;
+    int line_num;
+
+    UNUSED(line_num);
+
+	if (fp != NULL) {
+    	for (line_num = 1; getline(&line, &cap, fp) > 0; line_num++) {
+            search = strstr(line, key);
+            if (search != NULL) {
+                logMsg("key found here %s",line);
+                logMsg("value found here %s",search + strlen(key));
+                scale =  atof(search + strlen(key)) ;
+                logMsg("%s key  found: using  scale %f", key, scale);
+                break;
+            }
+            
+        }
+        free(line);
+        fclose(fp);
+    } else {
+        logMsg("%s file not found: using default scale %f", path, scale);
+    }
+
+    free(path);
+    logMsg("Returning: using  scale %f",  scale);
+    return (scale);
+}

@@ -2207,8 +2207,8 @@ disco_win_draw(XPLMWindowID inWindowID, void *inRefcon) {
     int w, h, mx, my;
 
     UNUSED(inRefcon);
-    XPLMGetScreenSize(&w, &h);
-    XPLMGetMouseLocation(&mx, &my);
+    BPGetScreenSizeUIScaled(&w, &h, B_FALSE);
+    XPLMGetMouseLocationGlobal(&mx, &my);
 
     XPLMSetGraphicsState(0, 1, 0, 0, 1, 0, 0);
     if (inWindowID == bp_ls.disco_win) {
@@ -2319,7 +2319,7 @@ disco_intf_show(void) {
     };
     int w, h;
 
-    XPLMGetScreenSize(&w, &h);
+    BPGetScreenSizeUIScaled(&w, &h, B_TRUE);
 
     disco_ops.left = w / 2 - 1.5 * disco_buttons[0].w;
     disco_ops.right = w / 2 - 0.5 * disco_buttons[0].w;

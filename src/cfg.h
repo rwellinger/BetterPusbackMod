@@ -54,6 +54,8 @@ void push_reset_fov_values(void);
 
 void pop_fov_values(void);
 
+void BPGetScreenSizeUIScaled(int *w, int *h, bool_t get_ui_scale);
+
 #ifdef    __cplusplus
 }
 #endif

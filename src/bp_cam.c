@@ -346,10 +346,10 @@ get_vp(vec4 vp) {
 
     ASSERT(vp != NULL);
         /*
-         * As fake_win is defined with 0,0 and sizes given by XPLMGetScreenSize
+         * As fake_win is defined with 0,0 and sizes given by BPGetScreenSizeUIScaled
          * let's do the same here. it will fix planner drawing in Xp12
          */
-        XPLMGetScreenSize(&scr_w, &scr_h);
+        BPGetScreenSizeUIScaled(&scr_w, &scr_h, B_FALSE);
         vp[0] = 0;
         vp[1] = 0;
         vp[2] = scr_w;
@@ -820,7 +820,7 @@ fake_win_draw(XPLMWindowID inWindowID, void *inRefcon) {
     UNUSED(inWindowID);
     UNUSED(inRefcon);
 
-    XPLMGetScreenSize(&w, &h);
+    BPGetScreenSizeUIScaled(&w, &h, B_FALSE);
     XPLMSetWindowGeometry(fake_win, 0, h, w, 0);
 
     if (!XPLMIsWindowInFront(fake_win))
@@ -858,7 +858,7 @@ button_hit_check(int x, int y) {
     double scale;
     int w, h, h_buttons, h_off;
 
-    XPLMGetScreenSize(&w, &h);
+    BPGetScreenSizeUIScaled(&w, &h, B_FALSE);
 
     h_buttons = 0;
     for (int i = 0; buttons[i].filename != NULL; i++)
@@ -1155,7 +1155,7 @@ bp_cam_start(void) {
 
     push_reset_fov_values();
 
-    XPLMGetScreenSize(&fake_win_ops.right, &fake_win_ops.top);
+    BPGetScreenSizeUIScaled(&fake_win_ops.right, &fake_win_ops.top, B_TRUE);
 
     circle_view_cmd = XPLMFindCommand("sim/view/circle");
     ASSERT(circle_view_cmd != NULL);
