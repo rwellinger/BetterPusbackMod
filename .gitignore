@@ -1,9 +1,9 @@
+*.zip
 *.cbp
 .idea
 lin64
 win64
 mac64
-BetterPushback_XP12_*.zip
 BetterPushback
 lin_x64
 win_x64
