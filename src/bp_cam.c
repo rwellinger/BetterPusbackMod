@@ -466,7 +466,7 @@ draw_segment(const seg_t *seg) {
             //                             -seg->start_pos.y, &info), ==, xplm_ProbeHitTerrain);
             if (XPLMProbeTerrainXYZ(probe, seg->start_pos.x, 0,
                                          -seg->start_pos.y, &info) != xplm_ProbeHitTerrain) {
-                    logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+                    //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
                     XPLMDestroyProbe(probe);
                     return ;
             }        
@@ -476,7 +476,7 @@ draw_segment(const seg_t *seg) {
             //                             -seg->end_pos.y, &info), ==, xplm_ProbeHitTerrain);
             if (XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
                                          -seg->end_pos.y, &info) != xplm_ProbeHitTerrain) {
-                    logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+                    //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
                     XPLMDestroyProbe(probe);
                     return ;
             }        
@@ -537,7 +537,7 @@ draw_segment(const seg_t *seg) {
 
                 if (XPLMProbeTerrainXYZ(probe, p1.x, 0, -p1.y,
                                              &info) != xplm_ProbeHitTerrain) {
-                        logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+                        //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
                         XPLMDestroyProbe(probe);
                         return ;
                 }        
@@ -683,7 +683,7 @@ draw_prediction(XPLMDrawingPhase phase, int before, void *refcon) {
 
         if (XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
                                      -seg->end_pos.y, &info)) {
-        logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+        //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
         XPLMDestroyProbe(probe);
         return (1);
         }        
@@ -715,7 +715,7 @@ draw_prediction(XPLMDrawingPhase phase, int before, void *refcon) {
         //                             -cursor_world_pos.y, &info), ==, xplm_ProbeHitTerrain);
         if (XPLMProbeTerrainXYZ(probe, cursor_world_pos.x, 0,
                                      -cursor_world_pos.y, &info)) {
-        logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+        //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
         XPLMDestroyProbe(probe);
         return (1);
         }                                             
@@ -728,7 +728,7 @@ draw_prediction(XPLMDrawingPhase phase, int before, void *refcon) {
         //                             -seg->end_pos.y, &info), ==, xplm_ProbeHitTerrain);
         if (XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
                                      -seg->end_pos.y, &info)) {
-        logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+        //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
         XPLMDestroyProbe(probe);
         return (1);
         }   
@@ -741,7 +741,7 @@ draw_prediction(XPLMDrawingPhase phase, int before, void *refcon) {
     //                             -cursor_world_pos.y, &info), ==, xplm_ProbeHitTerrain);
     if (XPLMProbeTerrainXYZ(probe, cursor_world_pos.x, 0,
                                  -cursor_world_pos.y, &info)) {
-    logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
+    //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
     XPLMDestroyProbe(probe);
     return (1);
     }   

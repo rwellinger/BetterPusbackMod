@@ -769,7 +769,7 @@ BPGetScreenSizeUIScaled(int *w, int *h, bool_t get_ui_scale) {
     if (ui_status.ui_scaled == 2 ) {
         *w = (int)((double) *w / ui_status.scale );
         *h = (int)((double) *h / ui_status.scale );
-        logMsg("Rescaled sizes w %d / h %d with %f",*w, *h, ui_status.scale );
+        //logMsg("Rescaled sizes w %d / h %d with %f",*w, *h, ui_status.scale );
     }
 }
 
@@ -790,10 +790,10 @@ get_ui_scale_from_pref(void) {
     	for (line_num = 1; getline(&line, &cap, fp) > 0; line_num++) {
             search = strstr(line, key);
             if (search != NULL) {
-                logMsg("key found here %s",line);
-                logMsg("value found here %s",search + strlen(key));
+                //logMsg("key found here %s",line);
+                //logMsg("value found here %s",search + strlen(key));
                 scale =  atof(search + strlen(key)) ;
-                logMsg("%s key  found: using  scale %f", key, scale);
+                //logMsg("%s key  found: using  scale %f", key, scale);
                 break;
             }
             
@@ -801,10 +801,10 @@ get_ui_scale_from_pref(void) {
         free(line);
         fclose(fp);
     } else {
-        logMsg("%s file not found: using default scale %f", path, scale);
+        //logMsg("%s file not found: using default scale %f", path, scale);
     }
 
     free(path);
-    logMsg("Returning: using  scale %f",  scale);
+    //logMsg("Returning: using  scale %f",  scale);
     return (scale);
 }
