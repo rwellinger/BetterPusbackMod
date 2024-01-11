@@ -59,7 +59,7 @@ msgstr "Errore pushback: l'aereo non è compatibile con BetterPushback."
 msgid ""
 "Pushback failure: master requested tug \"%s\", which we don't have in our in "
 "our library. Please sync your tug libraries before trying again."
-msgstr "Errore pushback: il master ha richiesto il rimorchiatore \"%s\", che 
+msgstr "Errore pushback: il master ha richiesto il rimorchiatore \"%s\", che"
 "non abbiamo nella nostra libreria. Sincronizza le tue librerie di "
 "rimorchiatori prima di riprovare."
 
