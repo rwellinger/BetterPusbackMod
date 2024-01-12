@@ -154,3 +154,6 @@ msgstr "Desconectar automática cuando termine **"
 
 msgid "Miscellaneous"
 msgstr "Misceláneas"
+
+msgid "Ignore setting parking brake **"
+msgstr "Ignore la verificación de estacionamiento **"

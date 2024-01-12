@@ -159,4 +159,4 @@ msgid "Miscellaneous"
 msgstr ""
 
 msgid "Ignore setting parking brake **"
-msgstr ""
+msgstr "Ignore check parking brake set **"

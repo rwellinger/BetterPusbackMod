@@ -143,9 +143,10 @@ const char *disco_when_done_tooltip =
         "the tug when the pushback operation is complete\n"
         "(Parking brake check will be by-passed)";
 const char *ignore_park_brake_tooltip =
-        "Never check to set parking brake\n"
-        "Some aircraft have problems with this operation.\n"
-        "But not only on the final, also on the beginning.";
+        "Never check \"set parking brake\"\n"
+        "Some aircraft stuck on this check.\n"
+        "It's on the beginning and on the end.\n"
+        "This should solve this problem.";
 const char *hide_xp11_tug_tooltip =
         "Hides default X-Plane 11 pushback tug.\n"
         "Restart X-Plane for this change to take effect.";
