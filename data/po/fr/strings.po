@@ -152,3 +152,15 @@ msgstr "Bouton gauche de la souris pour modifier l'angle de vue"
 
 msgid "Tug cab view"
 msgstr "Vue depuis le tracteur"
+
+msgid "** Settings related to the current aircraft"
+msgstr "** Paramètres liés à l'avion actuel"
+
+msgid "Hint: hover your mouse cursor over any knob to show a short description of what it does."
+msgstr "Astuce: passez le curseur de votre souris sur n'importe quel bouton pour afficher une desc."
+
+msgid "Auto disconnect when done **"
+msgstr "Déconnexion automatique une fois terminé **"
+
+msgid "Miscellaneous"
+msgstr "Divers"

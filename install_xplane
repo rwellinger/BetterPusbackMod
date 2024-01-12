@@ -1,0 +1,8 @@
+#!/bin/bash
+
+XPLANE_PLUGIN_DIR="/Users/robertw/X-Plane 12/Resources/plugins"
+
+rm -rf "${XPLANE_BP_DIR}/BetterPushback"
+cp -r ./BetterPushback "${XPLANE_PLUGIN_DIR}"
+
+xattr -dr com.apple.quarantine "${XPLANE_PLUGIN_DIR}/BetterPushback"

@@ -142,3 +142,18 @@ msgstr "Schlepper und Headset trennen + weitere Anweisungen per Handzeichen."
 
 msgid "Reconnect tow and await further instructions."
 msgstr "Schlepper wieder ankoppeln und weitere Anweisungen erwarten."
+
+msgid "** Settings related to the current aircraft"
+msgstr "** Einstellung bezieht sich auf aktuelles Flugzeug"
+
+msgid "Hint: hover your mouse cursor over any knob to show a short description of what it does."
+msgstr "Hinweis: es können Tooltips via Mauszeige über den Knöpfen und Buttons angezeigt werden."
+
+msgid "BetterPushback is open-source software. See COPYING for more information."
+msgstr "BetterPushback ist open-source software. Siehe COPYING für mehr Informationen"
+
+msgid "Auto disconnect when done **"
+msgstr "Am Ende automatisch trennen **"
+
+msgid "Miscellaneous"
+msgstr "Verschiedenes"

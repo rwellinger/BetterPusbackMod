@@ -57,6 +57,8 @@ static XPWidgetID main_win = NULL;
     "       Copyright 2017 S.Kiselkov, Modified RobWell 2024. All rights reserved."
 #define    COPYRIGHT2    "BetterPushback is open-source software. See COPYING for " \
             "more information."
+
+/* Warning this is used on PO Translation as ID */
 #define    TOOLTIP_HINT    "Hint: hover your mouse cursor over any knob to " \
             "show a short description of what it does."
 
@@ -497,7 +499,7 @@ create_main_window(void) {
     create_widget_rel(MARGIN,
                       MAIN_WINDOW_HEIGHT - 101 - (MAIN_WINDOW_SPACE + 10), B_FALSE,
                       main_window_width - 4 * MARGIN,
-                      BUTTON_HEIGHT, 1, "** Settings related to the current aircraft", 0, main_win,
+                      BUTTON_HEIGHT, 1, _("** Settings related to the current aircraft"), 0, main_win,
                       xpWidgetClass_Caption);
 
     create_widget_rel(MARGIN,
@@ -513,7 +515,7 @@ create_main_window(void) {
     create_widget_rel(MARGIN,
                       MAIN_WINDOW_HEIGHT - 49 - (MAIN_WINDOW_SPACE - 10), B_FALSE,
                       main_window_width - 4 * MARGIN,
-                      BUTTON_HEIGHT, 1, TOOLTIP_HINT, 0, main_win,
+                      BUTTON_HEIGHT, 1, _(TOOLTIP_HINT), 0, main_win,
                       xpWidgetClass_Caption);
 
     free_checkboxes(radio_out);

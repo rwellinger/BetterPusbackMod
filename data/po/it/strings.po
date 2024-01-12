@@ -160,3 +160,18 @@ msgstr "Tasto sinistro del mouse per riorientare la vista"
 
 msgid "Tug cab view"
 msgstr "Vista dal Tug"
+
+msgid "** Settings related to the current aircraft"
+msgstr "** Impostazioni relative all'aereo attuale"
+
+msgid "Hint: hover your mouse cursor over any knob to show a short description of what it does."
+msgstr "Suggerimento: posiziona il cursore del mouse su qualsiasi manopola per visualizzare una descrizione."
+
+msgid "BetterPushback is open-source software. See COPYING for more information."
+msgstr "BetterPushback is open-source software. Per ulteriori informazioni vedere COPYING."
+
+msgid "Auto disconnect when done **"
+msgstr "Disconnessione automatica al termine **"
+
+msgid "Miscellaneous"
+msgstr "Varie"

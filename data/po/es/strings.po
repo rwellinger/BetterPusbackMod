@@ -142,3 +142,15 @@ msgstr "Desconectar remolcador + auriculares y cambiar a señales manuales."
 
 msgid "Reconnect tow and await further instructions."
 msgstr "Reconectar remolcador y esperar instrucciones adicionales."
+
+msgid "** Settings related to the current aircraft"
+msgstr "** Configuraciones relacionadas con el avión actual."
+
+msgid "Hint: hover your mouse cursor over any knob to show a short description of what it does."
+msgstr "Sug: coloque el cursor del mouse sobre cualquier perilla para mostrar una breve desc de lo que hace."
+
+msgid "Auto disconnect when done **"
+msgstr "Desconectar automática cuando termine **"
+
+msgid "Miscellaneous"
+msgstr "Misceláneas"
