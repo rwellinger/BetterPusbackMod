@@ -176,5 +176,5 @@ msgstr "Disconnessione automatica al termine **"
 msgid "Miscellaneous"
 msgstr "Varie"
 
-msgid "Ignore setting parking brake **"
+msgid "Ignore check parking brake is set **"
 msgstr "Ignora il controllo del parcheggio **"

@@ -455,7 +455,7 @@ create_main_window(void) {
                     &buttons.disco_when_done,       disco_when_done_tooltip
             },
             {
-             _("Ignore setting parking brake **"),
+             _("Ignore check parking brake is set **"),
                     &buttons.ignore_set_park_brake, ignore_park_brake_tooltip
             },
             {
