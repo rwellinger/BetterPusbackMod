@@ -751,12 +751,12 @@ ui_status_init(void) {
     if (bp_xp_ver >= 12000) {
         ui_status.scale = dr_getf(&drs.ui_scale);
     } else {
-        // TODO as no datatef available for Xp11
-        // see pixel_multiplier 1.500000 in Miscellaneous.prf
+        //  no datatef available for Xp11
+        // see pixel_multiplier key in Miscellaneous.prf
         ui_status.scale = get_ui_scale_from_pref();
     }
     ui_status.ui_scaled = (ui_status.scale > 1.1) ? 2 : 1 ;
-    logMsg("ui_status initialised ui_scaled %d / scale %f",ui_status.ui_scaled, ui_status.scale );
+    //logMsg("ui_status initialised ui_scaled %d / scale %f",ui_status.ui_scaled, ui_status.scale );
 }
 
 void
