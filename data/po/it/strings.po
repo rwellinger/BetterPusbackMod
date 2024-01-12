@@ -1,0 +1,177 @@
+# CDDL HEADER START
+#
+# This file and its contents are supplied under the terms of the
+# Common Development and Distribution License ("CDDL"), version 1.0.
+# You may only use this file in accordance with the terms of version
+# 1.0 of the CDDL.
+#
+# A full copy of the text of the CDDL should have accompanied this
+# source.  A copy of the CDDL is also available via the Internet at
+# http://www.illumos.org/license/CDDL.
+#
+# CDDL HEADER END
+
+# Copyright 2017 Cyberguerro. All rights reserved.
+
+msgid ""
+msgstr ""
+"Last-Translator: cyberguerro@gmail.com"
+
+msgid "Can't start planner: aircraft not stationary."
+msgstr "Impossibile avviare il pianificatore: aereo non stazionario."
+
+msgid ""
+"Can't start planner: pushback already in progress. Please stop the pushback "
+"operation first."
+msgstr "Impossibile avviare la pianificazione: pushback già in corso. Per "
+"favore, interrompi il pushback prima."
+
+msgid "Can't start pushback planner: please set the parking brake first."
+msgstr "Impossibile avviare il pianificatore pushback: inserire prima il "
+"freno di stazionamento."
+
+msgid ""
+"Pushback advisory: you have your radio volume turned very low and may not be "
+"able to hear ground crew. Please increase your radio volume in the X-Plane "
+"sound preferences."
+msgstr "Avviso di pushback: hai il volume della radio molto basso e potresti "
+"non essere in grado di sentire il personale di terra. Aumenta il volume della "
+"radio nelle preferenze audio di X-Plane."
+
+msgid ""
+"Pushback failure: X-Plane version too old. This plugin requires at least X-"
+"Plane %s to operate."
+msgstr "Errore Pushback: versione X-Plane troppo vecchia. Questo plugin "
+"richiede almeno X-Plane %s per funzionare."
+
+msgid "Pushback failure: aircraft appears to not have any steerable gears."
+msgstr "Errore pushback: l'aereo sembra non avere alcun ingranaggio sterzante."
+
+msgid ""
+"Pushback failure: aircraft has non-positive wheelbase. Sorry, tail draggers "
+"aren't supported."
+msgstr "Errore pushback: l'aereo ha un passo non positivo. Siamo spiacenti, "
+"i trascinatori di coda non sono supportati."
+
+msgid "Pushback failure: aircraft is incompatible with BetterPushback."
+msgstr "Errore pushback: l'aereo non è compatibile con BetterPushback."
+
+msgid ""
+"Pushback failure: master requested tug \"%s\", which we don't have in our in "
+"our library. Please sync your tug libraries before trying again."
+msgstr "Errore pushback: il master ha richiesto il rimorchiatore \"%s\", che"
+"non abbiamo nella nostra libreria. Sincronizza le tue librerie di "
+"rimorchiatori prima di riprovare."
+
+msgid "Pushback failure: no suitable tug for your aircraft."
+msgstr "Errore pushback: nessun rimorchiatore adatto per il tuo aereo."
+
+msgid ""
+"Pushback failure: smartcopilot attempted to switch master/slave or network "
+"connection lost. Stopping operation."
+msgstr "Errore pushback: smartcopilot ha tentato di effettuare la commutazione "
+"master/slave o connessione di rete interrotta. Interruzione dell'operazione."
+
+msgid "Start pushback"
+msgstr "Avvio pushback"
+
+msgid "Stop pushback"
+msgstr "Stop pushback"
+
+msgid "Start pushback planner"
+msgstr "Avvio pianificatore pushback"
+
+msgid "Stop pushback planner"
+msgstr "Stop pianificatore pushback"
+
+msgid "Connect tug before entering pushback plan"
+msgstr "Collegare il rimorchiatore prima di accedere al piano di pushback"
+
+msgid "Pre-plan pushback"
+msgstr "Pianificazione pushback"
+
+msgid "Close pushback planner"
+msgstr "Chiudi pianificatore pushback"
+
+msgid "Preferences..."
+msgstr "Impostazioni..."
+
+msgid "BetterPushback Preferences"
+msgstr "Impostazioni BetterPushback"
+
+msgid "User interface"
+msgstr "Interfaccia utente"
+
+msgid "X-Plane's language"
+msgstr "Linguaggio X-Plane"
+
+msgid "Ground crew audio"
+msgstr "Audio personale di terra"
+
+msgid "My language only at domestic airports"
+msgstr "La mia lingua solo negli aeroporti locali"
+
+msgid "My language at all airports"
+msgstr "La mia lingua in tutti gli aeroporti"
+
+msgid "English at all airports"
+msgstr "Inglese in tutti gli aeroporti"
+
+msgid "Save preferences"
+msgstr "Salva le impostazioni"
+
+msgid "Ground crew speaks my language only if the country the airport is\n"
+"in speaks my language. Otherwise the ground crew speaks English\n"
+"with a local accent."
+msgstr "Il personale di terra parla la mia lingua solo se il paese in cui si trova\n"
+"l'aeroporto parla la mia lingua. Altrimenti il personale di terra parla inglese\n"
+"con accento locale."
+
+msgid "Ground crew speaks my language irrespective of what country the "
+"airport is in."
+msgstr "Il personale di terra parla la mia lingua, indipendentemente dal "
+"paese in cui si trova l'aeroporto."
+
+msgid "Ground crew always speaks English with a local accent."
+msgstr "Il personale di terra parla sempre inglese con accento locale."
+
+msgid "Save current preferences to disk."
+msgstr "Salva le Impostazioni correnti su disco."
+
+msgid "Disconnect tow + headset and switch to hand signals."
+msgstr "Scollegare il traino + l'auricolare e passare ai segnali manuali."
+
+msgid "Reconnect tow and await further instructions."
+msgstr "Ricollegare il traino e attendere ulteriori istruzioni."
+
+msgid "Pushback failure: cannot push this aircraft with engines running. "
+"Shutdown engines first."
+msgstr "Errore Pushback: non posso spingere l'aeromobile con i motori accesi. "
+"Spegnere prima i motori."
+
+msgid "Pushback failure: your flight controls are preventing me from steering "
+"the aircraft. Unbind any buttons you have set to\"toggle nosewheel steering\"."
+msgstr "Errore Pushback: i tuoi controlli di volo mi impediscono di governare "
+" l'aereo. Scollega tutti i pulsanti impostati su\"attiva/disattiva la guida "
+"con il carrello anteriore\"."
+
+msgid "Left mouse button to reorient view"
+msgstr "Tasto sinistro del mouse per riorientare la vista"
+
+msgid "Tug cab view"
+msgstr "Vista dal Tug"
+
+msgid "** Settings related to the current aircraft"
+msgstr "** Impostazioni relative all'aereo attuale"
+
+msgid "Hint: hover your mouse cursor over any knob to show a short description of what it does."
+msgstr "Suggerimento: posiziona il cursore del mouse su qualsiasi manopola per visualizzare una descrizione."
+
+msgid "BetterPushback is open-source software. See COPYING for more information."
+msgstr "BetterPushback is open-source software. Per ulteriori informazioni vedere COPYING."
+
+msgid "Auto disconnect when done **"
+msgstr "Disconnessione automatica al termine **"
+
+msgid "Miscellaneous"
+msgstr "Varie"

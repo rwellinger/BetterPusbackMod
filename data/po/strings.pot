@@ -145,3 +145,15 @@ msgstr ""
 
 msgid "Tug cab view"
 msgstr ""
+
+msgid "** Settings related to the current aircraft"
+msgstr ""
+
+msgid "Hint: hover your mouse cursor over any knob to show a short description of what it does."
+msgstr ""
+
+msgid "Auto disconnect when done **"
+msgstr ""
+
+msgid "Miscellaneous"
+msgstr ""

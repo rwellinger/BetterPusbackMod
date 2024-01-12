@@ -57,6 +57,8 @@ static XPWidgetID main_win = NULL;
     "       Copyright 2017 S.Kiselkov, Modified RobWell 2024. All rights reserved."
 #define    COPYRIGHT2    "BetterPushback is open-source software. See COPYING for " \
             "more information."
+
+/* Warning this is used on PO Translation as ID */
 #define    TOOLTIP_HINT    "Hint: hover your mouse cursor over any knob to " \
             "show a short description of what it does."
 
@@ -68,6 +70,7 @@ static struct {
     XPWidgetID portuguese;
     XPWidgetID russian;
     XPWidgetID spanish;
+    XPWidgetID italian;
     XPWidgetID xplang;
 
     XPWidgetID lang_pref_match_real;
@@ -174,6 +177,7 @@ buttons_update(void) {
     SET_LANG_BTN(french, "fr");
     SET_LANG_BTN(portuguese, "pt");
     SET_LANG_BTN(spanish, "es");
+    SET_LANG_BTN(italian, "it");
     SET_LANG_BTN(russian, "ru");
     SET_LANG_BTN(xplang, "XX");
 #undef    SET_LANG_BTN
@@ -240,6 +244,8 @@ main_window_cb(XPWidgetMessage msg, XPWidgetID widget, intptr_t param1,
             conf_set_str(bp_conf, "lang", "en");
         } else if (btn == buttons.spanish) {
             conf_set_str(bp_conf, "lang", "es");
+        } else if (btn == buttons.italian) {
+            conf_set_str(bp_conf, "lang", "it");
         } else if (btn == buttons.french) {
             conf_set_str(bp_conf, "lang", "fr");
         } else if (btn == buttons.portuguese) {
@@ -402,6 +408,7 @@ create_main_window(void) {
             {"Deutsch",               &buttons.german,     NULL},
             {"English",               &buttons.english,    NULL},
             {"Español",               &buttons.spanish,    NULL},
+            {"Italiano",               &buttons.italian,    NULL},
             {"Français",              &buttons.french,     NULL},
             {"Português",             &buttons.portuguese, NULL},
             {"Русский",               &buttons.russian,    NULL},
@@ -492,7 +499,7 @@ create_main_window(void) {
     create_widget_rel(MARGIN,
                       MAIN_WINDOW_HEIGHT - 101 - (MAIN_WINDOW_SPACE + 10), B_FALSE,
                       main_window_width - 4 * MARGIN,
-                      BUTTON_HEIGHT, 1, "** Settings related to the current aircraft", 0, main_win,
+                      BUTTON_HEIGHT, 1, _("** Settings related to the current aircraft"), 0, main_win,
                       xpWidgetClass_Caption);
 
     create_widget_rel(MARGIN,
@@ -508,7 +515,7 @@ create_main_window(void) {
     create_widget_rel(MARGIN,
                       MAIN_WINDOW_HEIGHT - 49 - (MAIN_WINDOW_SPACE - 10), B_FALSE,
                       main_window_width - 4 * MARGIN,
-                      BUTTON_HEIGHT, 1, TOOLTIP_HINT, 0, main_win,
+                      BUTTON_HEIGHT, 1, _(TOOLTIP_HINT), 0, main_win,
                       xpWidgetClass_Caption);
 
     free_checkboxes(radio_out);
