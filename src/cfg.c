@@ -78,6 +78,7 @@ static struct {
     XPWidgetID lang_pref_match_english;
 
     XPWidgetID disco_when_done;
+    XPWidgetID ignore_set_park_brake;
     XPWidgetID hide_xp11_tug;
     XPWidgetID show_dev_menu;
 
@@ -116,8 +117,11 @@ static struct {
 } ui_status = {0};
 
 void ui_status_init(void);
+
 float get_ui_scale_from_pref(void);
+
 void get_fov_values_impl(fov_t *values);
+
 void set_fov_values_impl(fov_t *values);
 
 /* Used to set a null tooltip in the button creation macros. */
@@ -138,6 +142,10 @@ const char *disco_when_done_tooltip =
         "Never ask and always automatically disconnect\n"
         "the tug when the pushback operation is complete\n"
         "(Parking brake check will be by-passed)";
+const char *ignore_park_brake_tooltip =
+        "Never check to set parking brake\n"
+        "Some aircraft have problems with this operation.\n"
+        "But not only on the final, also on the beginning.";
 const char *hide_xp11_tug_tooltip =
         "Hides default X-Plane 11 pushback tug.\n"
         "Restart X-Plane for this change to take effect.";
@@ -148,23 +156,21 @@ buttons_update(void) {
     char my_acf[512], my_path[512];
     lang_pref_t lang_pref;
     bool_t disco_when_done = B_FALSE;
+    bool_t ignore_park_brake = B_FALSE;
     bool_t show_dev_menu = B_FALSE;
     const char *radio_dev = "", *sound_dev = "";
 
     (void) conf_get_str(bp_conf, "lang", &lang);
     XPLMGetNthAircraftModel(0, my_acf, my_path);
-    //(void) conf_get_b(bp_conf, "disco_when_done", &disco_when_done);
+
     if (!conf_get_disco_when_done(my_acf, &disco_when_done)) {
-        // checking for setting linked to the aircraft, if not found
-        // fallback to the general setting
-        //logMsg(BP_INFO_LOG "'disco_when_done_%s' setting not found getting general setting", my_acf );
         conf_get_disco_when_done(NULL, &disco_when_done);
-        //ogMsg(BP_INFO_LOG "get 'disco_when_done' %s", (disco_when_done ? "True" : "False") );
-    } else {
-        //logMsg(BP_INFO_LOG "get 'disco_when_done_%s' %s", my_acf, (disco_when_done ? "True" : "False") );
     }
 
-    //(void) conf_get_b(bp_conf, "show_dev_menu", &show_dev_menu);
+    if (!conf_get_ignore_park_brake(my_acf, &ignore_park_brake)) {
+        conf_get_ignore_park_brake(NULL, &ignore_park_brake);
+    }
+
     (void) conf_get_str(bp_conf, "radio_device", &radio_dev);
     (void) conf_get_str(bp_conf, "sound_device", &sound_dev);
 
@@ -192,6 +198,8 @@ buttons_update(void) {
                         xpProperty_ButtonState, lang_pref == LANG_PREF_MATCH_ENGLISH);
     XPSetWidgetProperty(buttons.disco_when_done,
                         xpProperty_ButtonState, disco_when_done);
+    XPSetWidgetProperty(buttons.ignore_set_park_brake,
+                        xpProperty_ButtonState, ignore_park_brake);
     XPSetWidgetProperty(buttons.show_dev_menu, xpProperty_ButtonState,
                         show_dev_menu);
     // X-Plane 12 doesn't support this feature
@@ -266,9 +274,11 @@ main_window_cb(XPWidgetMessage msg, XPWidgetID widget, intptr_t param1,
             XPLMGetNthAircraftModel(0, my_acf, my_path);
             conf_set_disco_when_done(my_acf, XPGetWidgetProperty(buttons.disco_when_done,
                                                                  xpProperty_ButtonState, NULL));
-            //conf_set_b(bp_conf, "disco_when_done",
-            //           XPGetWidgetProperty(buttons.disco_when_done,
-            //                               xpProperty_ButtonState, NULL));
+        } else if (btn == buttons.ignore_set_park_brake) {
+            char my_acf[512], my_path[512];
+            XPLMGetNthAircraftModel(0, my_acf, my_path);
+            conf_set_ignore_park_brake(my_acf, XPGetWidgetProperty(buttons.ignore_set_park_brake,
+                                                                   xpProperty_ButtonState, NULL));
         } else if (btn == buttons.show_dev_menu) {
             conf_set_b(bp_conf, "show_dev_menu",
                        XPGetWidgetProperty(buttons.show_dev_menu,
@@ -408,7 +418,7 @@ create_main_window(void) {
             {"Deutsch",               &buttons.german,     NULL},
             {"English",               &buttons.english,    NULL},
             {"Español",               &buttons.spanish,    NULL},
-            {"Italiano",               &buttons.italian,    NULL},
+            {"Italiano",              &buttons.italian,    NULL},
             {"Français",              &buttons.french,     NULL},
             {"Português",             &buttons.portuguese, NULL},
             {"Русский",               &buttons.russian,    NULL},
@@ -437,28 +447,31 @@ create_main_window(void) {
     checkbox_t *sound_out = sound_checkboxes_init(_("Sound output device"),
                                                   &buttons.sound_devs, &buttons.num_sound_devs,
                                                   &buttons.sound_boxes, &buttons.num_sound_boxes);
-    checkbox_t other[4] = {
+    checkbox_t other[5] = {
             {_("Miscellaneous"), NULL, NULL},
             {
              _("Auto disconnect when done **"),
-                    &buttons.disco_when_done, disco_when_done_tooltip
+                    &buttons.disco_when_done,       disco_when_done_tooltip
+            },
+            {
+             _("Ignore setting parking brake **"),
+                    &buttons.ignore_set_park_brake, ignore_park_brake_tooltip
             },
             {
              _("Hide default X-Plane 11 tug"),
-                    &buttons.hide_xp11_tug,   hide_xp11_tug_tooltip
+                    &buttons.hide_xp11_tug,         hide_xp11_tug_tooltip
             },
             {NULL,               NULL, NULL}
     };
 
     if ((bp_xp_ver < 11000) || (bp_xp_ver >= 12000)) //Feature only for Xp11
-        other[2] = (checkbox_t) {NULL, NULL, NULL};
+        other[3] = (checkbox_t) {NULL, NULL, NULL};
 
     col1_width = measure_checkboxes_width(col1);
     col2_width = measure_checkboxes_width(col2);
     col3_width = measure_checkboxes_width(radio_out);
     col4_width = measure_checkboxes_width(sound_out);
-    main_window_width = 4 * MARGIN + col1_width + col2_width +
-                        MAX(col3_width, col4_width);
+    main_window_width = 4 * MARGIN + col1_width + col2_width + MAX(col3_width, col4_width);
 
     l = snprintf(NULL, 0, "%s", _("BetterPushback Preferences"));
     prefs_title = safe_malloc(l + 1);
@@ -476,8 +489,7 @@ create_main_window(void) {
     layout_checkboxes(col2, MARGIN + col1_width + MARGIN, MARGIN, tts);
     layout_checkboxes(other, MARGIN + col1_width + MARGIN,
                       MARGIN + 4.5 * BUTTON_HEIGHT, tts);
-    layout_checkboxes(radio_out, 3 * MARGIN + col1_width + col2_width,
-                      MARGIN, tts);
+    layout_checkboxes(radio_out, 3 * MARGIN + col1_width + col2_width, MARGIN, tts);
     layout_checkboxes(sound_out, 3 * MARGIN + col1_width + col2_width,
                       MARGIN + (buttons.num_radio_boxes + 1.5) * BUTTON_HEIGHT, tts);
 
@@ -647,7 +659,7 @@ bp_conf_open(void) {
     if (main_win == NULL)
         gui_init();
     else
-        buttons_update(); // again here as we may change to an other aircraft without relauching X-plane 
+        buttons_update(); // again here as we may change to another aircraft without relauching X-plane
     XPShowWidget(main_win);
 }
 
@@ -682,6 +694,27 @@ conf_get_disco_when_done(char *my_acf, bool_t *value) {
     }
 }
 
+bool_t
+conf_get_ignore_park_brake(char *my_acf, bool_t *value) {
+    if (my_acf == NULL) {
+        return conf_get_b(bp_conf, "ignore_park_brake",
+                          value);
+    } else {
+        int l;
+        bool_t result;
+        char *key;
+        l = snprintf(NULL, 0,
+                     "ignore_park_brake_%s", my_acf);
+        key = safe_malloc(l + 1);
+        snprintf(key, l + 1,
+                 "ignore_park_brake_%s", my_acf);
+        key_sanity(key);
+        result = conf_get_b(bp_conf, key, value);
+        free(key);
+        return result;
+    }
+}
+
 void
 conf_set_disco_when_done(char *my_acf, bool_t value) {
     if (my_acf == NULL) {
@@ -701,22 +734,41 @@ conf_set_disco_when_done(char *my_acf, bool_t value) {
     }
 }
 
+void
+conf_set_ignore_park_brake(char *my_acf, bool_t value) {
+    if (my_acf == NULL) {
+        (void) conf_set_b(bp_conf, "ignore_park_brake",
+                          value);
+    } else {
+        int l;
+        char *key;
+        l = snprintf(NULL, 0,
+                     "ignore_park_brake_%s", my_acf);
+        key = safe_malloc(l + 1);
+        snprintf(key, l + 1,
+                 "ignore_park_brake_%s", my_acf);
+        key_sanity(key);
+        conf_set_b(bp_conf, key, value);
+        free(key);
+    }
+}
+
 // Save the fov values ratio,angle
 // they need to be changed during the planner
 void
 push_reset_fov_values(void) {
     if (fov_values.planner_running) {
         //logMsg("Getting Fov values: Nothing done, planner already running");
-    }   
+    }
     if (!fov_values.planner_running) {
         fov_t new_values = {0};
         get_fov_values_impl(&fov_values);
         //logMsg("Getting Fov values");
         fov_values.planner_running = B_TRUE;
-        set_fov_values_impl(&new_values); 
+        set_fov_values_impl(&new_values);
         //logMsg("Resetting Fov values");
-        }
- 
+    }
+
 }
 
 void
@@ -727,19 +779,19 @@ get_fov_values_impl(fov_t *values) {
     values->fov_v_deg = dr_getf(&drs.fov_v_deg);
     if (bp_xp_ver >= 12000) // this one only exists in Xp12
         values->fov_v_ratio = dr_getf(&drs.fov_v_ratio);
-} 
+}
 
 void
 pop_fov_values(void) {
     if (!fov_values.planner_running) {
         //logMsg("Restoring Fov values: Nothing done, planner already stopped");
-    }   
+    }
     if (fov_values.planner_running) {
         set_fov_values_impl(&fov_values);
         fov_values.planner_running = B_FALSE;
         //logMsg("Restoring Fov values");
     }
- 
+
 }
 
 void
@@ -750,7 +802,7 @@ set_fov_values_impl(fov_t *values) {
     dr_setf(&drs.fov_v_deg, values->fov_v_deg);
     if (bp_xp_ver >= 12000) // this one only exists in Xp12
         dr_setf(&drs.fov_v_ratio, values->fov_v_ratio);
-} 
+}
 
 void
 ui_status_init(void) {
@@ -762,7 +814,7 @@ ui_status_init(void) {
         // see pixel_multiplier key in Miscellaneous.prf
         ui_status.scale = get_ui_scale_from_pref();
     }
-    ui_status.ui_scaled = (ui_status.scale > 1.1) ? 2 : 1 ;
+    ui_status.ui_scaled = (ui_status.scale > 1.1) ? 2 : 1;
     //logMsg("ui_status initialised ui_scaled %d / scale %f",ui_status.ui_scaled, ui_status.scale );
 }
 
@@ -770,12 +822,12 @@ void
 BPGetScreenSizeUIScaled(int *w, int *h, bool_t get_ui_scale) {
     XPLMGetScreenSize(w, h);
     //logMsg("Original sizes w %d / h %d", *w, *h);
-    if ((ui_status.ui_scaled == 0 ) || get_ui_scale) {
+    if ((ui_status.ui_scaled == 0) || get_ui_scale) {
         ui_status_init();
     }
-    if (ui_status.ui_scaled == 2 ) {
-        *w = (int)((double) *w / ui_status.scale );
-        *h = (int)((double) *h / ui_status.scale );
+    if (ui_status.ui_scaled == 2) {
+        *w = (int) ((double) *w / ui_status.scale);
+        *h = (int) ((double) *h / ui_status.scale);
         //logMsg("Rescaled sizes w %d / h %d with %f",*w, *h, ui_status.scale );
     }
 }
@@ -785,25 +837,25 @@ get_ui_scale_from_pref(void) {
     char *path = mkpathname(CONF_DIRS, MISC_FILENAME, NULL);
     const char *key = "pixel_multiplier";
     float scale = 1.0;
-	FILE *fp = fopen(path, "rb");
-	char *line = NULL;
-    char *search ;
-	size_t cap = 0;
+    FILE *fp = fopen(path, "rb");
+    char *line = NULL;
+    char *search;
+    size_t cap = 0;
     int line_num;
 
     UNUSED(line_num);
 
-	if (fp != NULL) {
-    	for (line_num = 1; getline(&line, &cap, fp) > 0; line_num++) {
+    if (fp != NULL) {
+        for (line_num = 1; getline(&line, &cap, fp) > 0; line_num++) {
             search = strstr(line, key);
             if (search != NULL) {
                 //logMsg("key found here %s",line);
                 //logMsg("value found here %s",search + strlen(key));
-                scale =  atof(search + strlen(key)) ;
+                scale = atof(search + strlen(key));
                 //logMsg("%s key  found: using  scale %f", key, scale);
                 break;
             }
-            
+
         }
         free(line);
         fclose(fp);

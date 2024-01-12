@@ -172,6 +172,8 @@ static XPLMFlightLoopID bp_floop = NULL;
 
 static bool_t cfg_disco_when_done = B_FALSE;
 
+static bool_t cfg_ignore_park_break = B_FALSE;
+
 static bool_t read_acf_file_info(void);
 
 static float bp_run(float elapsed, float elapsed2, int counter, void *refcon);
@@ -1161,13 +1163,16 @@ bp_init(void) {
     if (!conf_get_disco_when_done(my_acf, &cfg_disco_when_done)) {
         // checking for setting linked to the aircraft, if not found
         // fallback to the general setting
-        //logMsg(BP_INFO_LOG "'disco_when_done_%s' setting not found getting general setting", my_acf );
         conf_get_disco_when_done(NULL, &cfg_disco_when_done);
-        //logMsg(BP_INFO_LOG "get 'disco_when_done' %s", (cfg_disco_when_done ? "True" : "False") );
-    } else {
-        //logMsg(BP_INFO_LOG "get 'disco_when_done_%s' %s", my_acf, (cfg_disco_when_done ? "True" : "False") );
     }
-    
+
+    cfg_ignore_park_break = B_FALSE;
+    if (!conf_get_ignore_park_brake(my_acf, &cfg_ignore_park_break)) {
+        // checking for setting linked to the aircraft, if not found
+        // fallback to the general setting
+        conf_get_ignore_park_brake(NULL, &cfg_ignore_park_break);
+    }
+
     acf_override_file  = mkpathname(bp_xpdir, bp_plugindir, "objects", "override", my_acf, NULL);
     if (file_exists(acf_override_file, NULL)) {
         logMsg(BP_INFO_LOG "acf override file found in %s : using it  ", acf_override_file);
@@ -1720,7 +1725,7 @@ pb_step_waiting_for_pbrake(void) {
 
 static void
 pb_step_driving_up_connect(void) {
-    if (!slave_mode)
+    if (!slave_mode && !cfg_ignore_park_break)
         brakes_set(B_TRUE);
     if (!tug_is_stopped(bp_ls.tug)) {
         /*
@@ -1745,7 +1750,8 @@ pb_step_connect_grab(void) {
 
     if (!slave_mode) {
         /* When grabbing, keep the aircraft firmly in place */
-        brakes_set(B_TRUE);
+        if (!cfg_ignore_park_break)
+            brakes_set(B_TRUE);
     }
 
     if (cradle_closed_fract >= 1) {
@@ -1852,7 +1858,7 @@ pb_step_lift(void) {
     /* Iterate the lift */
     lift = (bp_ls.tug->info->lift_height * lift_fract) + bp.acf.nw_len +
            tug_plat_h(bp_ls.tug);
-    if (!slave_mode) {
+    if (!slave_mode && !cfg_ignore_park_break) {
         brakes_set(B_TRUE);
         dr_setvf(&drs.leg_len, &lift, bp.acf.nw_i, 1);
     }
@@ -2021,7 +2027,7 @@ pb_step_stopping(void) {
          */
         bp.step_start_t = bp.cur_t;
     } else {
-        if (!slave_mode)
+        if (!slave_mode && !cfg_ignore_park_break)
             brakes_set(B_TRUE);
         if (bp.cur_t - bp.step_start_t >= STATE_TRANS_DELAY) {
             msg_play(MSG_OP_COMPLETE);
@@ -2037,7 +2043,8 @@ pb_step_stopped(void) {
     if (!slave_mode) {
         turn_nosewheel(0);
         push_at_speed(0, bp.veh.max_accel, B_FALSE, B_FALSE);
-        brakes_set(B_TRUE);
+        if (!cfg_ignore_park_break)
+            brakes_set(B_TRUE);
     }
     if (!pbrake_is_set() && !cfg_disco_when_done) {
         /*
@@ -2065,7 +2072,8 @@ pb_step_lowering(void) {
 
     if (!slave_mode) {
         turn_nosewheel(0);
-        brakes_set(B_TRUE);
+        if (!cfg_ignore_park_break)
+            brakes_set(B_TRUE);
     }
 
     if (bp.cur_t - bp.last_voice_t < msg_dur(MSG_OP_COMPLETE)) {
