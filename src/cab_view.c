@@ -322,6 +322,7 @@ cab_view_start(void)
 		    .handleMouseWheelFunc = win_wheel,
 		    .refcon = NULL
 		};
+		BPGetScreenSizeUIScaled(&win_ops.right, &win_ops.top, B_TRUE);
 		win = XPLMCreateWindowEx(&win_ops);
 	}
 	ASSERT(win != NULL);
