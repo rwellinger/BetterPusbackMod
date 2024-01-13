@@ -14,6 +14,7 @@
 */
 /*
  * Copyright 2023 Saso Kiselkov. All rights reserved.
+ * Copyright 2024 Robert Wellinger. All rights reserved.
  */
 
 #ifndef    _BP_H_

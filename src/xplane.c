@@ -14,6 +14,7 @@
  */
 /*
  * Copyright 2022 Saso Kiselkov. All rights reserved.
+ * Copyright 2024 Robert Wellinger. All rights reserved.
  */
 
 #include <stddef.h>
