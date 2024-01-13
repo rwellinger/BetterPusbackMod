@@ -157,3 +157,6 @@ msgstr "Am Ende automatisch trennen **"
 
 msgid "Miscellaneous"
 msgstr "Verschiedenes"
+
+msgid "Ignore check parking brake is set **"
+msgstr "Mach kein Parking Brake check **"
