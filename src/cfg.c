@@ -14,6 +14,7 @@
 */
 /*
  * Copyright 2022 Saso Kiselkov. All rights reserved.
+ * Copyright 2024 Robert Wellinger. All rights reserved.
  */
 
 #include <string.h>
@@ -124,10 +125,6 @@ void get_fov_values_impl(fov_t *values);
 
 void set_fov_values_impl(fov_t *values);
 
-/* Used to set a null tooltip in the button creation macros. */
-const char *null_tooltip = NULL;
-const char *null_tooltip_xlated[2] = {NULL, NULL};
-
 const char *match_real_tooltip =
         "Ground crew speaks my language only if the country the airport is\n"
         "in speaks my language. Otherwise the ground crew speaks English\n"
@@ -146,7 +143,7 @@ const char *ignore_park_brake_tooltip =
         "Never check \"set parking brake\"\n"
         "Some aircraft stuck on this check.\n"
         "It's on the beginning and on the end.\n"
-        "This should solve this problem.";
+        "This should solve this problem for some aircraft's. (KA350 for instance)";
 const char *hide_xp11_tug_tooltip =
         "Hides default X-Plane 11 pushback tug.\n"
         "Restart X-Plane for this change to take effect.";

@@ -14,6 +14,7 @@
 */
 /*
  * Copyright 2017 Saso Kiselkov. All rights reserved.
+ * Copyright 2024 Robert Wellinger. All rights reserved.
  */
 
 #ifndef    _BP_XPLANE_H_

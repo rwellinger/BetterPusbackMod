@@ -14,7 +14,8 @@
 */
 /*
  * Copyright 2017 Saso Kiselkov. All rights reserved.
- */
+ * Copyright 2024 Robert Wellinger. All rights reserved.
+ * */
 
 #ifndef    _CFG_H_
 #define    _CFG_H_

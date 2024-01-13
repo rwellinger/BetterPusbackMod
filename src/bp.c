@@ -21,6 +21,7 @@
  */
 /*
  * Copyright 2022 Saso Kiselkov. All rights reserved.
+ * Copyright 2024 Robert Wellinger. All rights reserved.
  */
 
 #include <string.h>
@@ -57,8 +58,6 @@
 #include "msg.h"
 #include "xplane.h"
 
-/*#define	PB_DEBUG_INTF*/
-
 #define    MIN_XPLANE_VERSION    11550    /* X-Plane 11.55 */
 #define    MIN_XPLANE_VERSION_STR    "11.55"    /* X-Plane 11.55 */
 
@@ -82,19 +81,14 @@
 #define    MAX_REV_ANG_VEL        4    /* degrees per second */
 #define    MAX_CENTR_ACCEL        0.1    /* m/s^2 */
 #define    PB_CRADLE_DELAY        10    /* seconds */
-#define    PB_WINCH_DELAY        10    /* seconds */
-#define    PB_CONN_DELAY        25.0    /* seconds */
 #define    PB_CONN_LIFT_DELAY    13.0    /* seconds */
 #define    PB_CONN_LIFT_DURATION    9.0    /* seconds */
 #define    PB_START_DELAY        5    /* seconds */
-#define    PB_DRIVING_TURN_OFFSET    15    /* meters */
 #define    PB_LIFT_TE        0.075    /* fraction */
 #define    STATE_TRANS_DELAY    2    /* seconds, state transition delay */
 #define    CLEAR_SIGNAL_DELAY    15    /* seconds */
 #define    TUG_DRIVE_AWAY_DIST    80    /* meters */
 #define    MAX_DRIVING_AWAY_DELAY    30    /* seconds */
-
-#define    MAX_ARPT_DIST        10000    /* meters */
 
 #define    TUG_APPCH_LONG_DIST    (6 * bp_ls.tug->veh.wheelbase)
 
