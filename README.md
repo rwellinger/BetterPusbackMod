@@ -40,7 +40,8 @@ https://github.com/rwellinger/BetterPusbackMod/releases
 
 (Please be aware that the pre release maybe still has some issues inside and maybe is not final tested.)
 
-## Support if you like what we did:
+
+## To leave a voluntary donation, please follow the PayPal link below:
 
 https://www.paypal.com/donate/?hosted_button_id=NGZPRYALBDJU4
 
