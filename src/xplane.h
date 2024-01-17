@@ -77,6 +77,10 @@ const char *bp_get_lang(void);
 
 void bp_sched_reload(void);
 
+bool_t get_pref_widget_status(void);
+
+void set_pref_widget_status(bool_t active);
+
 #ifdef __cplusplus
 }
 #endif

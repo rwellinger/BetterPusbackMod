@@ -74,6 +74,10 @@ static int plugins_menu_item;
 static int start_pb_plan_menu_item, stop_pb_plan_menu_item;
 static int start_pb_menu_item, stop_pb_menu_item;
 static int cab_cam_menu_item, prefs_menu_item;
+static bool_t pref_widget_active_status = B_FALSE;
+
+bool_t get_pref_widget_status(void);
+void set_pref_widget_status(bool_t active);
 
 static int start_pb_handler(XPLMCommandRef, XPLMCommandPhase, void *);
 
@@ -268,12 +272,16 @@ start_pb_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     if (phase != xplm_CommandEnd)
         return (1);
 
+    if (get_pref_widget_status()) // do nothing if preference widget is active
+        return (1);
+
     XPLMCommandOnce(stop_cam);
     if (!bp_init())
         return (1);
     if (bp_num_segs() == 0 && !slave_mode) {
         if (!bp_cam_start())
             return (1);
+        XPLMEnableMenuItem(root_menu, prefs_menu_item, B_FALSE);
         XPLMEnableMenuItem(root_menu, start_pb_plan_menu_item, B_FALSE);
         XPLMEnableMenuItem(root_menu, stop_pb_plan_menu_item, B_TRUE);
         XPLMEnableMenuItem(root_menu, start_pb_menu_item, B_FALSE);
@@ -287,6 +295,7 @@ start_pb_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     if (!bp_start())
         return (1);
 
+    XPLMEnableMenuItem(root_menu, prefs_menu_item, B_FALSE);
     XPLMEnableMenuItem(root_menu, start_pb_plan_menu_item, B_FALSE);
     XPLMEnableMenuItem(root_menu, stop_pb_plan_menu_item, B_FALSE);
     XPLMEnableMenuItem(root_menu, start_pb_menu_item, B_FALSE);
@@ -310,6 +319,7 @@ stop_pb_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
         /* Reset the menu back */
         late_plan_requested = B_FALSE;
         XPLMEnableMenuItem(root_menu, start_pb_menu_item, B_FALSE);
+        XPLMEnableMenuItem(root_menu, prefs_menu_item, B_TRUE);
     }
     return (1);
 }
@@ -318,6 +328,11 @@ static int
 start_cam_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     UNUSED(cmd);
     UNUSED(refcon);
+
+    if (get_pref_widget_status()) // do nothing if preference widget is active
+        return (1);
+
+
     if (slave_mode || late_plan_requested)
         return (1);
     if (phase != xplm_CommandEnd || !bp_init() || !bp_cam_start()) {
@@ -325,6 +340,7 @@ start_cam_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
         return (1);
     }
 
+    XPLMEnableMenuItem(root_menu, prefs_menu_item, B_FALSE);
     XPLMEnableMenuItem(root_menu, start_pb_plan_menu_item, B_FALSE);
     XPLMEnableMenuItem(root_menu, stop_pb_plan_menu_item, B_TRUE);
     XPLMEnableMenuItem(root_menu, start_pb_menu_item, B_FALSE);
@@ -342,11 +358,13 @@ stop_cam_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     if (phase != xplm_CommandEnd || !bp_init() || !bp_cam_stop())
         return (1);
 
+    XPLMEnableMenuItem(root_menu, prefs_menu_item, B_TRUE);
     XPLMEnableMenuItem(root_menu, start_pb_plan_menu_item, B_TRUE);
     XPLMEnableMenuItem(root_menu, stop_pb_plan_menu_item, B_FALSE);
     XPLMEnableMenuItem(root_menu, start_pb_menu_item, B_TRUE);
     XPLMEnableMenuItem(root_menu, stop_pb_menu_item, B_FALSE);
     if (late_plan_requested) {
+        XPLMEnableMenuItem(root_menu, prefs_menu_item, B_FALSE);
         XPLMEnableMenuItem(root_menu, start_pb_plan_menu_item, B_FALSE);
         XPLMEnableMenuItem(root_menu, stop_pb_plan_menu_item, B_FALSE);
         XPLMEnableMenuItem(root_menu, start_pb_menu_item,
@@ -370,6 +388,10 @@ conn_first_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     UNUSED(refcon);
     if (phase != xplm_CommandEnd || !bp_init() || bp_started || slave_mode)
         return (0);
+
+        if (get_pref_widget_status()) // do nothing if preference widget is active
+        return (1);
+
     late_plan_requested = B_TRUE;
     (void) bp_cam_stop();
     if (!bp_start())
@@ -916,3 +938,18 @@ DllMain(HINSTANCE hinst, DWORD reason, LPVOID resvd)
     return (TRUE);
 }
 #endif    /* IBM */
+
+void
+set_pref_widget_status(bool_t active)
+{
+    pref_widget_active_status = active;
+    XPLMEnableMenuItem(root_menu, start_pb_menu_item, !active);
+    XPLMEnableMenuItem(root_menu, start_pb_plan_menu_item, !active);
+    XPLMEnableMenuItem(root_menu, prefs_menu_item, !active);
+}
+
+bool_t
+get_pref_widget_status(void)
+{
+    return pref_widget_active_status;
+}
