@@ -233,6 +233,7 @@ main_window_cb(XPWidgetMessage msg, XPWidgetID widget, intptr_t param1,
     UNUSED(param2);
 
     if (msg == xpMessage_CloseButtonPushed && widget == main_win) {
+        set_pref_widget_status(B_FALSE);
         XPHideWidget(main_win);
         return (1);
     } else if (msg == xpMsg_PushButtonPressed) {
@@ -659,6 +660,7 @@ bp_conf_open(void) {
     else
         buttons_update(); // again here as we may change to another aircraft without relauching X-plane
     XPShowWidget(main_win);
+    set_pref_widget_status(B_TRUE);
 }
 
 
