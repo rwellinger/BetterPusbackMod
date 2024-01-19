@@ -389,8 +389,9 @@ conn_first_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     if (phase != xplm_CommandEnd || !bp_init() || bp_started || slave_mode)
         return (0);
 
-        if (get_pref_widget_status()) // do nothing if preference widget is active
+    if (get_pref_widget_status()) { // do nothing if preference widget is active
         return (1);
+    }
 
     late_plan_requested = B_TRUE;
     (void) bp_cam_stop();
