@@ -438,7 +438,7 @@ bp_gather(void) {
      */
     bp.cur_pos.pos = VECT2(dr_getf(&drs.local_x),
                            -dr_getf(&drs.local_z));
-    bp.cur_pos.hdg = dr_getf(&drs.hdg);
+    bp.cur_pos.hdg = normalize_hdg(dr_getf(&drs.hdg));
     bp.cur_pos.spd = vect2_dotprod(hdg2dir(bp.cur_pos.hdg),
                                    VECT2(dr_getf(&drs.local_vx), -dr_getf(&drs.local_vz)));
     bp.cur_t = dr_getf(&drs.sim_time);
