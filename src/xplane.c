@@ -398,7 +398,21 @@ conn_first_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
 
     late_plan_requested = B_TRUE;
     (void) bp_cam_stop();
-    bp_delete_all_segs();       // so we will always present the route for review before start
+
+    /*
+     * The conn_first procedure results in 2 calls to bp_start(). First here to get the tug connected,
+     * then the second is issued by the user to get things moving.
+     * An *active* preplanned route interferes with the holding point after lift in 
+     * pb_step_lift() / late_plan_end_cond() .
+     * So we save an active preplanned route here and clear it.
+     * It will be loaded again when the planner is started for the final review in the
+     * user invocation of bp_start() so the planning is not lost but it may be modified.
+     */
+    if (bp_num_segs()) {
+        route_save(&bp.segs);
+        bp_delete_all_segs();
+    }
+
     if (!bp_start())
         return (1);
 
