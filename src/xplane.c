@@ -275,10 +275,13 @@ start_pb_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     if (get_pref_widget_status()) // do nothing if preference widget is active
         return (1);
 
-    XPLMCommandOnce(stop_cam);
+    stop_cam_handler(NULL, xplm_CommandEnd, NULL);     // synchronously stop a possible open cam
+
     if (!bp_init())
         return (1);
-    if (bp_num_segs() == 0 && !slave_mode) {
+
+    // if late_plan_requested always present plan for final review
+    if ((late_plan_requested || bp_num_segs() == 0) && !slave_mode) {
         if (!bp_cam_start())
             return (1);
         XPLMEnableMenuItem(root_menu, prefs_menu_item, B_FALSE);
@@ -395,6 +398,21 @@ conn_first_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
 
     late_plan_requested = B_TRUE;
     (void) bp_cam_stop();
+
+    /*
+     * The conn_first procedure results in 2 calls to bp_start(). First here to get the tug connected,
+     * then the second is issued by the user to get things moving.
+     * An *active* preplanned route interferes with the holding point after lift in 
+     * pb_step_lift() / late_plan_end_cond() .
+     * So we save an active preplanned route here and clear it.
+     * It will be loaded again when the planner is started for the final review in the
+     * user invocation of bp_start() so the planning is not lost but it may be modified.
+     */
+    if (bp_num_segs()) {
+        route_save(&bp.segs);
+        bp_delete_all_segs();
+    }
+
     if (!bp_start())
         return (1);
 
