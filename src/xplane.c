@@ -72,10 +72,10 @@ static XPLMCommandRef   abort_push;
 static XPLMMenuID root_menu;
 static int plugins_menu_item;
 static int start_pb_plan_menu_item, stop_pb_plan_menu_item;
-static int start_pb_menu_item, stop_pb_menu_item;
+static int start_pb_menu_item, stop_pb_menu_item, conn_first_menu_item;
 static int cab_cam_menu_item, prefs_menu_item;
 static bool_t prefs_enable, start_pb_plan_enable, stop_pb_plan_enable,
-    start_pb_enable, stop_pb_enable, cab_cam_enable;
+    start_pb_enable, stop_pb_enable, conn_first_enable, cab_cam_enable;
 
 static bool_t pref_widget_active_status = B_FALSE;
 
@@ -274,6 +274,7 @@ enable_menu_items() {
     XPLMEnableMenuItem(root_menu, stop_pb_menu_item, stop_pb_enable);
     XPLMEnableMenuItem(root_menu, start_pb_plan_menu_item, start_pb_plan_enable);
     XPLMEnableMenuItem(root_menu, stop_pb_plan_menu_item, stop_pb_plan_enable);
+    XPLMEnableMenuItem(root_menu, conn_first_menu_item, conn_first_enable);
     XPLMEnableMenuItem(root_menu, cab_cam_menu_item, cab_cam_enable);
 }
 
@@ -301,6 +302,7 @@ start_pb_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
         start_pb_plan_enable = B_FALSE;
         stop_pb_plan_enable = B_TRUE;
         start_pb_enable = B_FALSE;
+        conn_first_enable = B_FALSE;
         stop_pb_enable = B_FALSE;
         enable_menu_items();
         msg_play(MSG_PLAN_START);
@@ -316,6 +318,7 @@ start_pb_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     start_pb_plan_enable = B_FALSE;
     stop_pb_plan_enable = B_FALSE;
     start_pb_enable = B_FALSE;
+    conn_first_enable = B_FALSE;
     stop_pb_enable = !slave_mode;
     enable_menu_items();
     return (1);
@@ -336,6 +339,7 @@ stop_pb_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
         /* Reset the menu back */
         late_plan_requested = B_FALSE;
         start_pb_enable = B_FALSE;
+        conn_first_enable = B_FALSE;
         prefs_enable = B_TRUE;
         enable_menu_items();
     }
@@ -362,6 +366,7 @@ start_cam_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     start_pb_plan_enable = B_FALSE;
     stop_pb_plan_enable = B_TRUE;
     start_pb_enable = B_FALSE;
+    conn_first_enable = B_FALSE;
     stop_pb_enable = B_FALSE;
     enable_menu_items();
     return (1);
@@ -381,6 +386,7 @@ stop_cam_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     start_pb_plan_enable = B_TRUE;
     stop_pb_plan_enable = B_FALSE;
     start_pb_enable = B_TRUE;
+    conn_first_enable = B_TRUE;
     stop_pb_enable = B_FALSE;
     enable_menu_items();
 
@@ -389,6 +395,7 @@ stop_cam_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
         start_pb_plan_enable = B_FALSE;
         stop_pb_plan_enable = B_FALSE;
         start_pb_enable = (bp_num_segs() == 0);
+        conn_first_enable = B_FALSE;
         stop_pb_enable = B_TRUE;
         enable_menu_items();
     } else if (start_after_cam) {
@@ -439,6 +446,7 @@ conn_first_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
         stop_pb_plan_enable = B_FALSE;
         start_pb_enable = (bp_num_segs() == 0);
         stop_pb_enable = B_TRUE;
+        conn_first_enable = B_FALSE;
         enable_menu_items();
     }
     return (1);
@@ -483,6 +491,7 @@ void
 bp_done_notify(void) {
     if (!slave_mode) {
         start_pb_enable = B_TRUE;
+        conn_first_enable = B_TRUE;
         stop_pb_enable = B_FALSE;
         start_pb_plan_enable = B_TRUE;
         stop_pb_plan_enable = B_FALSE;
@@ -510,6 +519,7 @@ bp_reconnect_notify(void) {
     start_pb_plan_enable = B_FALSE;
     stop_pb_plan_enable = B_TRUE;
     start_pb_enable = B_FALSE;
+    conn_first_enable = B_FALSE;
     stop_pb_enable = B_TRUE;
     enable_menu_items();
 }
@@ -527,7 +537,8 @@ coupled_state_change()
 {
     /* If we were in slave mode, reenable the menu items. */
     start_pb_enable = slave_mode ? 1 : 0;
-    start_pb_plan_enable = slave_mode ? 1 : 0;
+    conn_first_enable = start_pb_enable;
+    start_pb_plan_enable = start_pb_enable;
 
     stop_pb_enable = B_FALSE;
     stop_pb_plan_enable = B_FALSE;
@@ -865,12 +876,15 @@ bp_priv_enable(void) {
                                             _("Start pushback"), start_pb, 1);
     stop_pb_menu_item = XPLMAppendMenuItem(root_menu,
                                            _("Stop pushback"), stop_pb, 1);
+    conn_first_menu_item = XPLMAppendMenuItem(root_menu,
+                                           _("Connect tug first"), conn_first, 1);
     cab_cam_menu_item = XPLMAppendMenuItem(root_menu,
                                            _("Tug cab view"), cab_cam, 1);
     prefs_menu_item = XPLMAppendMenuItem(root_menu,
                                          _("Preferences..."), &prefs_menu_item, 1);
 
     start_pb_enable = B_TRUE;
+    conn_first_enable = B_TRUE;
     stop_pb_enable = B_FALSE;
     start_pb_plan_enable = B_TRUE;
     stop_pb_plan_enable = B_FALSE;
@@ -986,6 +1000,7 @@ set_pref_widget_status(bool_t active)
 {
     pref_widget_active_status = active;
     start_pb_enable = !active;
+    conn_first_enable = !active;
     start_pb_plan_enable = !active;
     prefs_enable = !active;
     enable_menu_items();
