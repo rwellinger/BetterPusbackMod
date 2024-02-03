@@ -283,16 +283,18 @@ start_pb_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     UNUSED(cmd);
     UNUSED(refcon);
 
-    if (phase != xplm_CommandEnd)
+    if (phase != xplm_CommandEnd || !bp_init())
         return (1);
 
     if (get_pref_widget_status()) // do nothing if preference widget is active
         return (1);
 
-    stop_cam_handler(NULL, xplm_CommandEnd, NULL);     // synchronously stop a possible open cam
-
-    if (!bp_init())
+    if (!start_pb_enable) {
+        logMsg(BP_WARN_LOG "Command \"BetterPushback/start\" is currently disabled");
         return (1);
+    }
+
+    stop_cam_handler(NULL, xplm_CommandEnd, NULL);     // synchronously stop a possible open cam
 
     // if late_plan_requested always present plan for final review
     if ((late_plan_requested || bp_num_segs() == 0) && !slave_mode) {
@@ -328,10 +330,14 @@ static int
 stop_pb_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     UNUSED(cmd);
     UNUSED(refcon);
-    if (slave_mode)
+
+    if (slave_mode ||phase != xplm_CommandEnd || !bp_init())
         return (1);
-    if (phase != xplm_CommandEnd || !bp_init())
+
+    if (!stop_pb_enable) {
+        logMsg(BP_WARN_LOG "Command \"BetterPushback/stop\" is currently disabled");
         return (1);
+    }
 
     (void) bp_stop();
     op_complete = B_TRUE;
@@ -354,10 +360,18 @@ start_cam_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     if (get_pref_widget_status()) // do nothing if preference widget is active
         return (1);
 
-
     if (slave_mode || late_plan_requested)
         return (1);
-    if (phase != xplm_CommandEnd || !bp_init() || !bp_cam_start()) {
+
+    if (phase != xplm_CommandEnd || !bp_init())
+        return (1);
+
+    if (!start_pb_plan_enable) {
+        logMsg(BP_WARN_LOG "Command \"BetterPushback/start_planner\" is currently disabled");
+        return (1);
+    }
+
+    if (!bp_cam_start()) {
         start_after_cam = B_FALSE;
         return (1);
     }
@@ -377,9 +391,15 @@ stop_cam_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     UNUSED(cmd);
     UNUSED(refcon);
 
-    if (slave_mode)
+    if (slave_mode || phase != xplm_CommandEnd || !bp_init())
         return (1);
-    if (phase != xplm_CommandEnd || !bp_init() || !bp_cam_stop())
+
+    if (!stop_pb_plan_enable) {
+        logMsg(BP_WARN_LOG "Command \"BetterPushback/stop_planner\" is currently disabled");
+        return (1);
+    }
+
+    if (!bp_cam_stop())
         return (1);
 
     prefs_enable = B_TRUE;
@@ -416,6 +436,11 @@ conn_first_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     UNUSED(refcon);
     if (phase != xplm_CommandEnd || !bp_init() || bp_started || slave_mode)
         return (0);
+
+    if (!conn_first_enable) {
+        logMsg(BP_WARN_LOG "Command \"BetterPushback/connect_first\" is currently disabled");
+        return (0);
+    }
 
     if (get_pref_widget_status()) { // do nothing if preference widget is active
         return (1);
@@ -458,6 +483,12 @@ cab_cam_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     UNUSED(refcon);
     if (phase != xplm_CommandEnd)
         return (0);
+
+    if (!cab_cam_enable) {
+        logMsg(BP_WARN_LOG "Command \"BetterPushback/cab_cam\" is currently disabled");
+        return (0);
+    }
+
     if (!cab_view_start()) {
         XPLMSpeakString(_("ERROR: Unable to select pushback tug view at this time."));
         return (0);
