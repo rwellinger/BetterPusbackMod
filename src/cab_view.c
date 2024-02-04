@@ -155,9 +155,8 @@ cam_ctl(XPLMCameraPosition_t *pos, int losing_control, void *refcon)
 
 	if (XPLMProbeTerrainXYZ(probe, bp_ls.tug->pos.pos.x, 0,
 	    -bp_ls.tug->pos.pos.y, &info)) {
-    //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
-    XPLMDestroyProbe(probe);
-    return (1);
+    	XPLMDestroyProbe(probe);
+    	return (1);
     }   
 
 	/* Must be upright, no driving on ceilings! */

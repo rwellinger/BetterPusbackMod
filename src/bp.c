@@ -1172,7 +1172,6 @@ bp_init(void) {
         logMsg(BP_INFO_LOG "acf override file found in %s : using it  ", acf_override_file);
         bp_ls.outline = acf_outline_read(acf_override_file);
     } else {
-        //logMsg(BP_INFO_LOG "acf override file NOT found: using original file %s ", my_path);
         bp_ls.outline = acf_outline_read(my_path);
     }
     free(acf_override_file);
