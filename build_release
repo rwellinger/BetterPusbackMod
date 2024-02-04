@@ -123,6 +123,13 @@ function install_po_files() {
 	done
 }
 
+function install_font_files() {
+	FILES=( $( find data/fonts -iname '*.otf' -or -iname '*.ttf' ) )
+	for FILE in ${FILES[@]}; do
+		install_xtra_file "$FILE" ""
+	done
+}
+
 function install_override_files() {
 	FILES=( $( find objects/override -iname '*.acf' ) )
 	for FILE in ${FILES[@]}; do
@@ -204,7 +211,7 @@ install_audio_files
 install_icon_files
 install_tug_files
 install_override_files
-
+install_font_files
 # Build Delivery
 zip -r ${ZIP_DELIVERY_FILE} BetterPushback
 

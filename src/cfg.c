@@ -19,6 +19,7 @@
 
 #include <string.h>
 #include <errno.h>
+#include <curl/curl.h>
 
 #include <XPLMGraphics.h>
 #include <XPWidgets.h>
@@ -35,6 +36,10 @@
 #include "cfg.h"
 #include "msg.h"
 #include "xplane.h"
+ 
+#define GITURL "https://api.github.com/repos/rwellinger/BetterPusbackMod/releases/latest"
+#define	DL_TIMEOUT		5L		/* seconds */
+#define MAX_VERSION_BF_SIZE 32000 
 
 #define    CONF_FILENAME    "BetterPushback.cfg"
 #define    CONF_DIRS    bp_xpdir, "Output", "preferences"
@@ -117,6 +122,18 @@ static struct {
     float scale;
 } ui_status = {0};
 
+static struct {
+    bool_t new_version_available;
+	char version[MAX_VERSION_BF_SIZE] ;
+} gitHubVersion ; 
+ 
+
+struct curl_memory {
+  char *response;
+  size_t size;
+};
+
+
 void ui_status_init(void);
 
 float get_ui_scale_from_pref(void);
@@ -124,6 +141,8 @@ float get_ui_scale_from_pref(void);
 void get_fov_values_impl(fov_t *values);
 
 void set_fov_values_impl(fov_t *values);
+
+void fetchGitVersion(void);
 
 const char *match_real_tooltip =
         "Ground crew speaks my language only if the country the airport is\n"
@@ -582,6 +601,8 @@ bp_conf_init(void) {
         fdr_find(&drs.fov_v_ratio, "sim/graphics/view/field_of_view_vertical_ratio");
         fdr_find(&drs.ui_scale, "sim/graphics/misc/user_interface_scale");
     }
+
+    fetchGitVersion();
     return (B_TRUE);
 }
 
@@ -757,16 +778,11 @@ conf_set_ignore_park_brake(char *my_acf, bool_t value) {
 // they need to be changed during the planner
 void
 push_reset_fov_values(void) {
-    if (fov_values.planner_running) {
-        //logMsg("Getting Fov values: Nothing done, planner already running");
-    }
     if (!fov_values.planner_running) {
         fov_t new_values = {0};
         get_fov_values_impl(&fov_values);
-        //logMsg("Getting Fov values");
         fov_values.planner_running = B_TRUE;
         set_fov_values_impl(&new_values);
-        //logMsg("Resetting Fov values");
     }
 
 }
@@ -783,13 +799,9 @@ get_fov_values_impl(fov_t *values) {
 
 void
 pop_fov_values(void) {
-    if (!fov_values.planner_running) {
-        //logMsg("Restoring Fov values: Nothing done, planner already stopped");
-    }
     if (fov_values.planner_running) {
         set_fov_values_impl(&fov_values);
         fov_values.planner_running = B_FALSE;
-        //logMsg("Restoring Fov values");
     }
 
 }
@@ -815,20 +827,17 @@ ui_status_init(void) {
         ui_status.scale = get_ui_scale_from_pref();
     }
     ui_status.ui_scaled = (ui_status.scale > 1.1) ? 2 : 1;
-    //logMsg("ui_status initialised ui_scaled %d / scale %f",ui_status.ui_scaled, ui_status.scale );
 }
 
 void
 BPGetScreenSizeUIScaled(int *w, int *h, bool_t get_ui_scale) {
     XPLMGetScreenSize(w, h);
-    //logMsg("Original sizes w %d / h %d", *w, *h);
     if ((ui_status.ui_scaled == 0) || get_ui_scale) {
         ui_status_init();
     }
     if (ui_status.ui_scaled == 2) {
         *w = (int) ((double) *w / ui_status.scale);
         *h = (int) ((double) *h / ui_status.scale);
-        //logMsg("Rescaled sizes w %d / h %d with %f",*w, *h, ui_status.scale );
     }
 }
 
@@ -849,21 +858,140 @@ get_ui_scale_from_pref(void) {
         for (line_num = 1; getline(&line, &cap, fp) > 0; line_num++) {
             search = strstr(line, key);
             if (search != NULL) {
-                //logMsg("key found here %s",line);
-                //logMsg("value found here %s",search + strlen(key));
                 scale = atof(search + strlen(key));
-                //logMsg("%s key  found: using  scale %f", key, scale);
                 break;
             }
 
         }
         free(line);
         fclose(fp);
-    } else {
-        //logMsg("%s file not found: using default scale %f", path, scale);
     }
 
     free(path);
-    //logMsg("Returning: using  scale %f",  scale);
     return (scale);
+}
+
+
+
+
+ 
+static size_t wrCallback(void *data, size_t size, size_t nmemb, void *clientp)
+{
+  size_t realsize = size * nmemb;
+  struct curl_memory *mem = (struct curl_memory *)clientp;
+ 
+  char *ptr = realloc(mem->response, mem->size + realsize + 1);
+  if(!ptr)
+    return 0;  /* out of memory! */
+ 
+  mem->response = ptr;
+  memcpy(&(mem->response[mem->size]), data, realsize);
+  mem->size += realsize;
+  mem->response[mem->size] = 0;
+ 
+  return realsize;
+}
+
+void
+parse_response(char * response, char *parsed)
+{
+    char * firstpos = NULL;
+    char * lastpos = NULL;
+    size_t tag_length;
+
+
+    memset(parsed, '\0', MAX_VERSION_BF_SIZE);
+
+    firstpos = strstr(response, "tag_name");
+    if (firstpos == NULL) {
+        goto in_error;
+    }
+    firstpos = strstr(firstpos, "\"") + 1;
+    if (firstpos == NULL) {
+        goto in_error;
+    }
+    firstpos = strstr(firstpos, "\"") + 1;
+    if (firstpos == NULL) {
+        goto in_error;
+    }
+    lastpos = strstr(firstpos, "\"");
+    if (lastpos == NULL) {
+        goto in_error;
+    }
+
+    tag_length = lastpos - firstpos;
+
+    if (( tag_length > (MAX_VERSION_BF_SIZE -1) ) || ( tag_length <= 0)) {
+        logMsg("Response len %ld over buffer len size %d.. skipping", tag_length, MAX_VERSION_BF_SIZE - 1);
+        goto in_error;
+    }
+
+    memcpy(parsed, firstpos, tag_length);
+    return ;
+
+    in_error:
+    logMsg("Unable to parse git json response;");
+    return ;
+
+}
+ 
+ 
+void fetchGitVersion(void)
+{
+    CURL *curl_handle;
+    CURLcode res;
+    gitHubVersion.new_version_available = B_FALSE;
+    struct curl_memory response = {0};
+
+    curl_global_init(CURL_GLOBAL_ALL);
+
+    /* init the curl session */
+    curl_handle = curl_easy_init();
+
+    if (curl_handle) {
+        struct curl_slist *chunk = NULL;
+
+        chunk = curl_slist_append(chunk, "Accept: application/vnd.github+json");
+        chunk = curl_slist_append(chunk, "X-GitHub-Api-Version: 2022-11-28");
+        curl_easy_setopt(curl_handle, CURLOPT_HTTPHEADER, chunk);
+
+        curl_easy_setopt(curl_handle, CURLOPT_URL, GITURL);
+        curl_easy_setopt(curl_handle, CURLOPT_HTTPGET, 1L);
+        curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, wrCallback);
+        curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void *)&response);
+
+        curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1L);
+        curl_easy_setopt(curl_handle, CURLOPT_TIMEOUT, DL_TIMEOUT);
+
+       //curl_easy_setopt(curl_handle, CURLOPT_SSL_VERIFYPEER, 0L);
+
+        curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "curl/8.3.0");
+
+        res = curl_easy_perform(curl_handle);
+
+        /* check for errors */
+        if(res != CURLE_OK) {
+            logMsg("curl_easy_perform() failed: %s.. skipping", curl_easy_strerror(res));
+        }
+        else {
+            parse_response(response.response, gitHubVersion.version);
+            gitHubVersion.new_version_available = 	(strcmp (gitHubVersion.version, BP_PLUGIN_VERSION) != 0);
+            logMsg("current version %s / new available version %s / update available %s", BP_PLUGIN_VERSION, gitHubVersion.version, gitHubVersion.new_version_available ? "true":"false");
+        }
+
+        free(response.response);
+
+        /* cleanup curl stuff */
+        curl_easy_cleanup(curl_handle);
+        curl_slist_free_all(chunk);
+
+
+        /* we are done with libcurl, so clean it up */
+        curl_global_cleanup();
+    }
+ 
+}
+
+char * getPluginUpdateStatus(void) {
+    return ( gitHubVersion.new_version_available ? gitHubVersion.version : NULL );
 }
