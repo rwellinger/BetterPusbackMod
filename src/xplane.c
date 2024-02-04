@@ -903,12 +903,12 @@ bp_priv_enable(void) {
                                                  _("Pre-plan pushback"), start_cam, 1);
     stop_pb_plan_menu_item = XPLMAppendMenuItem(root_menu,
                                                 _("Close pushback planner"), stop_cam, 1);
+    conn_first_menu_item = XPLMAppendMenuItem(root_menu,
+                                           _("Connect tug first"), conn_first, 1);
     start_pb_menu_item = XPLMAppendMenuItem(root_menu,
                                             _("Start pushback"), start_pb, 1);
     stop_pb_menu_item = XPLMAppendMenuItem(root_menu,
                                            _("Stop pushback"), stop_pb, 1);
-    conn_first_menu_item = XPLMAppendMenuItem(root_menu,
-                                           _("Connect tug first"), conn_first, 1);
     cab_cam_menu_item = XPLMAppendMenuItem(root_menu,
                                            _("Tug cab view"), cab_cam, 1);
     prefs_menu_item = XPLMAppendMenuItem(root_menu,
