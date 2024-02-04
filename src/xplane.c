@@ -72,8 +72,11 @@ static XPLMCommandRef   abort_push;
 static XPLMMenuID root_menu;
 static int plugins_menu_item;
 static int start_pb_plan_menu_item, stop_pb_plan_menu_item;
-static int start_pb_menu_item, stop_pb_menu_item;
+static int start_pb_menu_item, stop_pb_menu_item, conn_first_menu_item;
 static int cab_cam_menu_item, prefs_menu_item;
+static bool_t prefs_enable, start_pb_plan_enable, stop_pb_plan_enable,
+    start_pb_enable, stop_pb_enable, conn_first_enable, cab_cam_enable;
+
 static bool_t pref_widget_active_status = B_FALSE;
 
 bool_t get_pref_widget_status(void);
@@ -264,31 +267,46 @@ init_core_state(void) {
     plan_complete = B_FALSE;
 }
 
+static void
+enable_menu_items() {
+    XPLMEnableMenuItem(root_menu, prefs_menu_item, prefs_enable);
+    XPLMEnableMenuItem(root_menu, start_pb_menu_item, start_pb_enable);
+    XPLMEnableMenuItem(root_menu, stop_pb_menu_item, stop_pb_enable);
+    XPLMEnableMenuItem(root_menu, start_pb_plan_menu_item, start_pb_plan_enable);
+    XPLMEnableMenuItem(root_menu, stop_pb_plan_menu_item, stop_pb_plan_enable);
+    XPLMEnableMenuItem(root_menu, conn_first_menu_item, conn_first_enable);
+    XPLMEnableMenuItem(root_menu, cab_cam_menu_item, cab_cam_enable);
+}
+
 static int
 start_pb_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     UNUSED(cmd);
     UNUSED(refcon);
 
-    if (phase != xplm_CommandEnd)
+    if (phase != xplm_CommandEnd || !bp_init())
         return (1);
 
     if (get_pref_widget_status()) // do nothing if preference widget is active
         return (1);
 
-    stop_cam_handler(NULL, xplm_CommandEnd, NULL);     // synchronously stop a possible open cam
-
-    if (!bp_init())
+    if (!start_pb_enable) {
+        logMsg(BP_WARN_LOG "Command \"BetterPushback/start\" is currently disabled");
         return (1);
+    }
+
+    stop_cam_handler(NULL, xplm_CommandEnd, NULL);     // synchronously stop a possible open cam
 
     // if late_plan_requested always present plan for final review
     if ((late_plan_requested || bp_num_segs() == 0) && !slave_mode) {
         if (!bp_cam_start())
             return (1);
-        XPLMEnableMenuItem(root_menu, prefs_menu_item, B_FALSE);
-        XPLMEnableMenuItem(root_menu, start_pb_plan_menu_item, B_FALSE);
-        XPLMEnableMenuItem(root_menu, stop_pb_plan_menu_item, B_TRUE);
-        XPLMEnableMenuItem(root_menu, start_pb_menu_item, B_FALSE);
-        XPLMEnableMenuItem(root_menu, stop_pb_menu_item, B_FALSE);
+        prefs_enable = B_FALSE;
+        start_pb_plan_enable = B_FALSE;
+        stop_pb_plan_enable = B_TRUE;
+        start_pb_enable = B_FALSE;
+        conn_first_enable = B_FALSE;
+        stop_pb_enable = B_FALSE;
+        enable_menu_items();
         msg_play(MSG_PLAN_START);
         start_after_cam = B_TRUE;
         return (1);
@@ -298,12 +316,13 @@ start_pb_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     if (!bp_start())
         return (1);
 
-    XPLMEnableMenuItem(root_menu, prefs_menu_item, B_FALSE);
-    XPLMEnableMenuItem(root_menu, start_pb_plan_menu_item, B_FALSE);
-    XPLMEnableMenuItem(root_menu, stop_pb_plan_menu_item, B_FALSE);
-    XPLMEnableMenuItem(root_menu, start_pb_menu_item, B_FALSE);
-    XPLMEnableMenuItem(root_menu, stop_pb_menu_item, !slave_mode);
-
+    prefs_enable = B_FALSE;
+    start_pb_plan_enable = B_FALSE;
+    stop_pb_plan_enable = B_FALSE;
+    start_pb_enable = B_FALSE;
+    conn_first_enable = B_FALSE;
+    stop_pb_enable = !slave_mode;
+    enable_menu_items();
     return (1);
 }
 
@@ -311,18 +330,24 @@ static int
 stop_pb_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     UNUSED(cmd);
     UNUSED(refcon);
-    if (slave_mode)
+
+    if (slave_mode ||phase != xplm_CommandEnd || !bp_init())
         return (1);
-    if (phase != xplm_CommandEnd || !bp_init())
+
+    if (!stop_pb_enable) {
+        logMsg(BP_WARN_LOG "Command \"BetterPushback/stop\" is currently disabled");
         return (1);
+    }
 
     (void) bp_stop();
     op_complete = B_TRUE;
     if (!slave_mode) {
         /* Reset the menu back */
         late_plan_requested = B_FALSE;
-        XPLMEnableMenuItem(root_menu, start_pb_menu_item, B_FALSE);
-        XPLMEnableMenuItem(root_menu, prefs_menu_item, B_TRUE);
+        start_pb_enable = B_FALSE;
+        conn_first_enable = B_FALSE;
+        prefs_enable = B_TRUE;
+        enable_menu_items();
     }
     return (1);
 }
@@ -335,19 +360,29 @@ start_cam_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     if (get_pref_widget_status()) // do nothing if preference widget is active
         return (1);
 
-
     if (slave_mode || late_plan_requested)
         return (1);
-    if (phase != xplm_CommandEnd || !bp_init() || !bp_cam_start()) {
+
+    if (phase != xplm_CommandEnd || !bp_init())
+        return (1);
+
+    if (!start_pb_plan_enable) {
+        logMsg(BP_WARN_LOG "Command \"BetterPushback/start_planner\" is currently disabled");
+        return (1);
+    }
+
+    if (!bp_cam_start()) {
         start_after_cam = B_FALSE;
         return (1);
     }
 
-    XPLMEnableMenuItem(root_menu, prefs_menu_item, B_FALSE);
-    XPLMEnableMenuItem(root_menu, start_pb_plan_menu_item, B_FALSE);
-    XPLMEnableMenuItem(root_menu, stop_pb_plan_menu_item, B_TRUE);
-    XPLMEnableMenuItem(root_menu, start_pb_menu_item, B_FALSE);
-    XPLMEnableMenuItem(root_menu, stop_pb_menu_item, B_FALSE);
+    prefs_enable = B_FALSE;
+    start_pb_plan_enable = B_FALSE;
+    stop_pb_plan_enable = B_TRUE;
+    start_pb_enable = B_FALSE;
+    conn_first_enable = B_FALSE;
+    stop_pb_enable = B_FALSE;
+    enable_menu_items();
     return (1);
 }
 
@@ -356,23 +391,33 @@ stop_cam_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     UNUSED(cmd);
     UNUSED(refcon);
 
-    if (slave_mode)
-        return (1);
-    if (phase != xplm_CommandEnd || !bp_init() || !bp_cam_stop())
+    if (slave_mode || phase != xplm_CommandEnd || !bp_init())
         return (1);
 
-    XPLMEnableMenuItem(root_menu, prefs_menu_item, B_TRUE);
-    XPLMEnableMenuItem(root_menu, start_pb_plan_menu_item, B_TRUE);
-    XPLMEnableMenuItem(root_menu, stop_pb_plan_menu_item, B_FALSE);
-    XPLMEnableMenuItem(root_menu, start_pb_menu_item, B_TRUE);
-    XPLMEnableMenuItem(root_menu, stop_pb_menu_item, B_FALSE);
+    if (!stop_pb_plan_enable) {
+        logMsg(BP_WARN_LOG "Command \"BetterPushback/stop_planner\" is currently disabled");
+        return (1);
+    }
+
+    if (!bp_cam_stop())
+        return (1);
+
+    prefs_enable = B_TRUE;
+    start_pb_plan_enable = B_TRUE;
+    stop_pb_plan_enable = B_FALSE;
+    start_pb_enable = B_TRUE;
+    conn_first_enable = B_TRUE;
+    stop_pb_enable = B_FALSE;
+    enable_menu_items();
+
     if (late_plan_requested) {
-        XPLMEnableMenuItem(root_menu, prefs_menu_item, B_FALSE);
-        XPLMEnableMenuItem(root_menu, start_pb_plan_menu_item, B_FALSE);
-        XPLMEnableMenuItem(root_menu, stop_pb_plan_menu_item, B_FALSE);
-        XPLMEnableMenuItem(root_menu, start_pb_menu_item,
-                           bp_num_segs() == 0);
-        XPLMEnableMenuItem(root_menu, stop_pb_menu_item, B_TRUE);
+        prefs_enable = B_FALSE;
+        start_pb_plan_enable = B_FALSE;
+        stop_pb_plan_enable = B_FALSE;
+        start_pb_enable = (bp_num_segs() == 0);
+        conn_first_enable = B_FALSE;
+        stop_pb_enable = B_TRUE;
+        enable_menu_items();
     } else if (start_after_cam) {
         if (bp_num_segs() != 0)
             XPLMCommandOnce(start_pb);
@@ -391,6 +436,11 @@ conn_first_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     UNUSED(refcon);
     if (phase != xplm_CommandEnd || !bp_init() || bp_started || slave_mode)
         return (0);
+
+    if (!conn_first_enable) {
+        logMsg(BP_WARN_LOG "Command \"BetterPushback/connect_first\" is currently disabled");
+        return (0);
+    }
 
     if (get_pref_widget_status()) { // do nothing if preference widget is active
         return (1);
@@ -417,11 +467,12 @@ conn_first_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
         return (1);
 
     if (!slave_mode) {
-        XPLMEnableMenuItem(root_menu, start_pb_plan_menu_item, B_FALSE);
-        XPLMEnableMenuItem(root_menu, stop_pb_plan_menu_item, B_FALSE);
-        XPLMEnableMenuItem(root_menu, start_pb_menu_item,
-                           bp_num_segs() == 0);
-        XPLMEnableMenuItem(root_menu, stop_pb_menu_item, B_TRUE);
+        start_pb_plan_enable = B_FALSE;
+        stop_pb_plan_enable = B_FALSE;
+        start_pb_enable = (bp_num_segs() == 0);
+        stop_pb_enable = B_TRUE;
+        conn_first_enable = B_FALSE;
+        enable_menu_items();
     }
     return (1);
 }
@@ -432,6 +483,12 @@ cab_cam_handler(XPLMCommandRef cmd, XPLMCommandPhase phase, void *refcon) {
     UNUSED(refcon);
     if (phase != xplm_CommandEnd)
         return (0);
+
+    if (!cab_cam_enable) {
+        logMsg(BP_WARN_LOG "Command \"BetterPushback/cab_cam\" is currently disabled");
+        return (0);
+    }
+
     if (!cab_view_start()) {
         XPLMSpeakString(_("ERROR: Unable to select pushback tug view at this time."));
         return (0);
@@ -464,10 +521,12 @@ menu_cb(void *inMenuRef, void *inItemRef) {
 void
 bp_done_notify(void) {
     if (!slave_mode) {
-        XPLMEnableMenuItem(root_menu, start_pb_menu_item, B_TRUE);
-        XPLMEnableMenuItem(root_menu, stop_pb_menu_item, B_FALSE);
-        XPLMEnableMenuItem(root_menu, start_pb_plan_menu_item, B_TRUE);
-        XPLMEnableMenuItem(root_menu, stop_pb_plan_menu_item, B_FALSE);
+        start_pb_enable = B_TRUE;
+        conn_first_enable = B_TRUE;
+        stop_pb_enable = B_FALSE;
+        start_pb_plan_enable = B_TRUE;
+        stop_pb_plan_enable = B_FALSE;
+        enable_menu_items();
     }
 
 #ifndef    SLAVE_DEBUG
@@ -488,10 +547,12 @@ bp_reconnect_notify(void) {
     late_plan_requested = B_TRUE;
     VERIFY(bp_cam_start());
     msg_play(MSG_PLAN_START);
-    XPLMEnableMenuItem(root_menu, start_pb_plan_menu_item, B_FALSE);
-    XPLMEnableMenuItem(root_menu, stop_pb_plan_menu_item, B_TRUE);
-    XPLMEnableMenuItem(root_menu, start_pb_menu_item, B_FALSE);
-    XPLMEnableMenuItem(root_menu, stop_pb_menu_item, B_TRUE);
+    start_pb_plan_enable = B_FALSE;
+    stop_pb_plan_enable = B_TRUE;
+    start_pb_enable = B_FALSE;
+    conn_first_enable = B_FALSE;
+    stop_pb_enable = B_TRUE;
+    enable_menu_items();
 }
 
 const char *
@@ -506,11 +567,13 @@ static void
 coupled_state_change()
 {
     /* If we were in slave mode, reenable the menu items. */
-    XPLMEnableMenuItem(root_menu, start_pb_menu_item, slave_mode ? 1 : 0);
-    XPLMEnableMenuItem(root_menu, start_pb_plan_menu_item, slave_mode ? 1 : 0);
+    start_pb_enable = slave_mode ? 1 : 0;
+    conn_first_enable = start_pb_enable;
+    start_pb_plan_enable = start_pb_enable;
 
-    XPLMEnableMenuItem(root_menu, stop_pb_menu_item, B_FALSE);
-    XPLMEnableMenuItem(root_menu, stop_pb_plan_menu_item, B_FALSE);
+    stop_pb_enable = B_FALSE;
+    stop_pb_plan_enable = B_FALSE;
+    enable_menu_items();
 }
 
 void
@@ -547,7 +610,8 @@ status_check(float elapsed, float elapsed2, int counter, void *refcon)
     UNUSED(counter);
     UNUSED(refcon);
 
-    XPLMEnableMenuItem(root_menu, cab_cam_menu_item, cab_view_can_start());
+    cab_cam_enable = cab_view_can_start();
+    enable_menu_items();
 
     // Status check only needed if we have a known system of coupling installed...
     if (!smartcopilot_present && !sharedflight_present)
@@ -839,6 +903,8 @@ bp_priv_enable(void) {
                                                  _("Pre-plan pushback"), start_cam, 1);
     stop_pb_plan_menu_item = XPLMAppendMenuItem(root_menu,
                                                 _("Close pushback planner"), stop_cam, 1);
+    conn_first_menu_item = XPLMAppendMenuItem(root_menu,
+                                           _("Connect tug first"), conn_first, 1);
     start_pb_menu_item = XPLMAppendMenuItem(root_menu,
                                             _("Start pushback"), start_pb, 1);
     stop_pb_menu_item = XPLMAppendMenuItem(root_menu,
@@ -848,11 +914,13 @@ bp_priv_enable(void) {
     prefs_menu_item = XPLMAppendMenuItem(root_menu,
                                          _("Preferences..."), &prefs_menu_item, 1);
 
-    XPLMEnableMenuItem(root_menu, start_pb_menu_item, B_TRUE);
-    XPLMEnableMenuItem(root_menu, stop_pb_menu_item, B_FALSE);
-    XPLMEnableMenuItem(root_menu, start_pb_plan_menu_item, B_TRUE);
-    XPLMEnableMenuItem(root_menu, stop_pb_plan_menu_item, B_FALSE);
-    XPLMEnableMenuItem(root_menu, cab_cam_menu_item, B_FALSE);
+    start_pb_enable = B_TRUE;
+    conn_first_enable = B_TRUE;
+    stop_pb_enable = B_FALSE;
+    start_pb_plan_enable = B_TRUE;
+    stop_pb_plan_enable = B_FALSE;
+    cab_cam_enable = B_FALSE;
+    enable_menu_items();
 
     XPLMRegisterFlightLoopCallback(status_check, STATUS_CHECK_INTVAL, NULL);
 
@@ -962,9 +1030,11 @@ void
 set_pref_widget_status(bool_t active)
 {
     pref_widget_active_status = active;
-    XPLMEnableMenuItem(root_menu, start_pb_menu_item, !active);
-    XPLMEnableMenuItem(root_menu, start_pb_plan_menu_item, !active);
-    XPLMEnableMenuItem(root_menu, prefs_menu_item, !active);
+    start_pb_enable = !active;
+    conn_first_enable = !active;
+    start_pb_plan_enable = !active;
+    prefs_enable = !active;
+    enable_menu_items();
 }
 
 bool_t
