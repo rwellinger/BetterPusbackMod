@@ -72,12 +72,6 @@ void unload_buttons(void);
 void nil_win_key(XPLMWindowID inWindowID, char inKey, XPLMKeyFlags inFlags,
                  char inVirtualKey, void *inRefcon, int losingFocus);
 
-void draw_bottom_msg(int screen_x, int screen_y);
-
-void clear_bottom_msg(void);
-
-void init_bottom_msg(char *msg);
-
 #ifdef    __cplusplus
 }
 #endif
