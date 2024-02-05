@@ -262,6 +262,7 @@ init_core_state(void) {
     slave_mode = B_FALSE;
     op_complete = B_FALSE;
     plan_complete = B_FALSE;
+    cab_view_init();
 }
 
 static int
