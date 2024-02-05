@@ -922,7 +922,7 @@ parse_response(char * response, char *parsed)
     tag_length = lastpos - firstpos;
 
     if (( tag_length > (MAX_VERSION_BF_SIZE -1) ) || ( tag_length <= 0)) {
-        logMsg("Response len %ld over buffer len size %d.. skipping", tag_length, MAX_VERSION_BF_SIZE - 1);
+        logMsg("Response len %d over buffer len size %d.. skipping", (int)tag_length, MAX_VERSION_BF_SIZE - 1);
         goto in_error;
     }
 
