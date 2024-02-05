@@ -61,6 +61,8 @@ void pop_fov_values(void);
 
 void BPGetScreenSizeUIScaled(int *w, int *h, bool_t get_ui_scale);
 
+char * getPluginUpdateStatus(void);
+
 #ifdef    __cplusplus
 }
 #endif
