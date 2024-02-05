@@ -63,6 +63,7 @@ static XPLMWindowID win = NULL;
 static uint64_t hintbar_start = 0;
 static XPWidgetID hintbar = NULL;
 static dr_t cab_pos_dr;
+static dr_t view_is_external_dr;
 
 static view_cmd_info_t view_cmds[] = {
     VCI_POS("sim/general/left",				-INCR_MED, 0, 0),
@@ -118,6 +119,7 @@ cab_view_init(void)
 	d_pos = ZERO_VECT3;
 	d_orient = ZERO_VECT2;
 	zoom = 1.0;
+	fdr_find(&view_is_external_dr, "sim/graphics/view/view_is_external");
 }
 
 void
@@ -132,7 +134,12 @@ cab_view_fini(void)
 bool_t
 cab_view_can_start(void)
 {
-	return (!started && bp_started && bp_ls.tug != NULL);
+	/*
+	 * If the current view is external the cab_view is invisible
+	 * but steals mouse events and never resets.
+	 */
+	bool_t is_external = (bool_t)dr_geti(&view_is_external_dr);
+	return (!started && bp_started && bp_ls.tug != NULL && !is_external);
 }
 
 static int
