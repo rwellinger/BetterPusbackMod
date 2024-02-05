@@ -963,7 +963,7 @@ void fetchGitVersion(void)
         curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1L);
         curl_easy_setopt(curl_handle, CURLOPT_TIMEOUT, DL_TIMEOUT);
 
-       //curl_easy_setopt(curl_handle, CURLOPT_SSL_VERIFYPEER, 0L);
+        curl_easy_setopt(curl_handle, CURLOPT_SSL_VERIFYPEER, 0L); // avoid SSL issue on Windows
 
         curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "curl/8.3.0");
 
