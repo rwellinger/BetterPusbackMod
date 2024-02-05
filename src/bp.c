@@ -1875,6 +1875,7 @@ pb_step_lift(void) {
     }
 
     if (d_t >= PB_CONN_LIFT_DURATION + STATE_TRANS_DELAY) {
+        bp_connected = B_TRUE;
         if (late_plan_requested) {
             /*
              * The user requested a late plan, so this is as
@@ -2642,7 +2643,8 @@ bp_run(float elapsed, float elapsed2, int counter, void *refcon) {
             dr_seti(&drs.override_steer, 0);
     }
 
-    bp_connected = (bp.step >= PB_STEP_DRIVING_UP_CONNECT &&
+    // that's the default, may be fine tuned in pb_step_lift
+    bp_connected = (bp.step >= PB_STEP_CONNECTED &&
                     bp.step <= PB_STEP_MOVING_AWAY);
 
     /*
