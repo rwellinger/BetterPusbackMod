@@ -51,6 +51,7 @@ file(GLOB OPUSFILE_PREFIX "${LIBACFUTILS}/opus/opusfile-${PLAT_LONG}")
 file(GLOB LIBOGG_PREFIX "${LIBACFUTILS}/opus/libogg-${PLAT_LONG}/install")
 file(GLOB OPENSSL_PREFIX "${LIBACFUTILS}/ssl/openssl-${PLAT_LONG}")
 file(GLOB ICONV_PREFIX "${LIBACFUTILS}/libiconv/libiconv-${PLAT_LONG}")
+file(GLOB CURL_PREFIX "${LIBACFUTILS}/curl/libcurl-${PLAT_LONG}")
 
 file(GLOB SRC *.c)
 file(GLOB HDR *.h)
@@ -78,6 +79,7 @@ include_directories(bp PUBLIC
     "${CAIRO_PREFIX}/include/cairo"
     "${FREETYPE_PREFIX}/include/freetype2"
     "${GLEW_PREFIX}/include"
+    "${CURL_PREFIX}/include"
     )
 
 # Compiler flags
@@ -92,6 +94,7 @@ endif()
 add_definitions(-D_GNU_SOURCE)
 add_definitions(-D_FILE_OFFSET_BITS=64)
 add_definitions(-DDEBUG)
+add_definitions(-DCURL_STATICLIB)
 add_definitions(-DGLEW_BUILD=GLEW_STATIC -DGLEW_MX)
 add_definitions(-DPCRE2_CODE_UNIT_WIDTH=8 -DPCRE2_STATIC)
 add_definitions(-DLIBXML_STATIC)

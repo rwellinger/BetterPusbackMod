@@ -29,6 +29,8 @@
 
 #include <png.h>
 
+#include "text_rendering.h"
+
 #include <XPLMCamera.h>
 #include <XPLMGraphics.h>
 #include <XPLMInstance.h>
@@ -80,6 +82,15 @@
 
 #define    PREDICTION_DRAWING_PHASE    xplm_Phase_Window
 #define    PREDICTION_DRAWING_PHASE_BEFORE    1
+
+#if	IBM
+#define	BOTTOM_MSG_FONT		"Aileron\\Aileron-Regular.otf"
+#else	/* !IBM */
+#define	BOTTOM_MSG_FONT		"Aileron/Aileron-Regular.otf"
+#endif	/* !IBM */
+#define	BOTTOM_MSG_FONT_SIZE	21
+
+enum { MARGIN_SIZE = 10 };
 
 static vect3_t cam_pos;
 static double cam_height;
@@ -179,6 +190,19 @@ static button_t buttons[] = {
 };
 static int button_hit = -1, button_lit = -1;
 static bool_t cam_inited = B_FALSE;
+
+static struct {
+	char		*msg;
+	int		timeout;
+	uint64_t	end;
+	int		width;
+	int		height;
+	GLuint		texture;
+	uint8_t		*bytes;
+} bottom_msg = { NULL, 0, 0, 0, 0, 0, NULL };
+
+static FT_Library ft;
+static FT_Face face;
 
 bool_t
 load_icon(button_t *btn) {
@@ -466,7 +490,6 @@ draw_segment(const seg_t *seg) {
             //                             -seg->start_pos.y, &info), ==, xplm_ProbeHitTerrain);
             if (XPLMProbeTerrainXYZ(probe, seg->start_pos.x, 0,
                                          -seg->start_pos.y, &info) != xplm_ProbeHitTerrain) {
-                    //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
                     XPLMDestroyProbe(probe);
                     return ;
             }        
@@ -476,7 +499,6 @@ draw_segment(const seg_t *seg) {
             //                             -seg->end_pos.y, &info), ==, xplm_ProbeHitTerrain);
             if (XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
                                          -seg->end_pos.y, &info) != xplm_ProbeHitTerrain) {
-                    //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
                     XPLMDestroyProbe(probe);
                     return ;
             }        
@@ -537,7 +559,6 @@ draw_segment(const seg_t *seg) {
 
                 if (XPLMProbeTerrainXYZ(probe, p1.x, 0, -p1.y,
                                              &info) != xplm_ProbeHitTerrain) {
-                        //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
                         XPLMDestroyProbe(probe);
                         return ;
                 }        
@@ -683,7 +704,6 @@ draw_prediction(XPLMDrawingPhase phase, int before, void *refcon) {
 
         if (XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
                                      -seg->end_pos.y, &info)) {
-        //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
         XPLMDestroyProbe(probe);
         return (1);
         }        
@@ -715,9 +735,8 @@ draw_prediction(XPLMDrawingPhase phase, int before, void *refcon) {
         //                             -cursor_world_pos.y, &info), ==, xplm_ProbeHitTerrain);
         if (XPLMProbeTerrainXYZ(probe, cursor_world_pos.x, 0,
                                      -cursor_world_pos.y, &info)) {
-        //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
-        XPLMDestroyProbe(probe);
-        return (1);
+            XPLMDestroyProbe(probe);
+            return (1);
         }                                             
         draw_acf_symbol(VECT3(cursor_world_pos.x, info.locationY,
                               cursor_world_pos.y), cursor_hdg, RED_TUPLE);
@@ -728,9 +747,8 @@ draw_prediction(XPLMDrawingPhase phase, int before, void *refcon) {
         //                             -seg->end_pos.y, &info), ==, xplm_ProbeHitTerrain);
         if (XPLMProbeTerrainXYZ(probe, seg->end_pos.x, 0,
                                      -seg->end_pos.y, &info)) {
-        //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
-        XPLMDestroyProbe(probe);
-        return (1);
+            XPLMDestroyProbe(probe);
+            return (1);
         }   
         draw_acf_symbol(VECT3(seg->end_pos.x, info.locationY,
                               seg->end_pos.y), seg->end_hdg, GREEN_TUPLE);
@@ -741,9 +759,8 @@ draw_prediction(XPLMDrawingPhase phase, int before, void *refcon) {
     //                             -cursor_world_pos.y, &info), ==, xplm_ProbeHitTerrain);
     if (XPLMProbeTerrainXYZ(probe, cursor_world_pos.x, 0,
                                  -cursor_world_pos.y, &info)) {
-    //logMsg(BP_WARN_LOG "XPLMProbeTerrainXYZ != xplm_ProbeHitTerrain  continuing anyway");
-    XPLMDestroyProbe(probe);
-    return (1);
+        XPLMDestroyProbe(probe);
+        return (1);
     }   
     di.structSize = sizeof(di);
     di.x = cursor_world_pos.x;
@@ -850,6 +867,10 @@ fake_win_draw(XPLMWindowID inWindowID, void *inRefcon) {
 
         draw_icon(btn, w - btn->w * scale, h_off - btn->h * scale,
                   scale, i == button_hit, i == button_lit);
+    }
+
+    if (bottom_msg.msg != NULL) {
+        draw_bottom_msg(w,h);
     }
 }
 
@@ -1106,6 +1127,8 @@ bp_cam_start(void) {
     char icao[8] = {0};
     char *cam_obj_path;
     char airline[1024] = {0};
+    char bottom_msg[256] = {0};
+    char *updateAvailable;
 
     if (cam_inited || !bp_init())
         return (B_FALSE);
@@ -1214,6 +1237,12 @@ bp_cam_start(void) {
     }
     cam_inited = B_TRUE;
 
+    updateAvailable = getPluginUpdateStatus();
+    if (updateAvailable != NULL) {
+        snprintf(bottom_msg, sizeof(bottom_msg), "New version of BetterPushBack available: %s", updateAvailable);
+        init_bottom_msg(bottom_msg);
+    }
+    
     return (B_TRUE);
 }
 
@@ -1260,10 +1289,109 @@ bp_cam_stop(void) {
 
     pop_fov_values();
 
+    clear_bottom_msg();
+
     return (B_TRUE);
 }
 
 bool_t
 bp_cam_is_running(void) {
     return (cam_inited);
+}
+
+void
+init_bottom_msg(char *msg)
+{
+	FT_Error err;
+	char *filename;
+    int tex_w, tex_h;
+    uint8_t *tex_bytes;
+    
+    if ((err = FT_Init_FreeType(&ft)) != 0) {
+		logMsg("Error initializing FreeType library: %s",
+		    ft_err2str(err));
+		return ;
+	}
+
+	filename = mkpathname(bp_plugindir, "data", "fonts", BOTTOM_MSG_FONT,
+	    NULL);
+	if ((err = FT_New_Face(ft, filename, 0, &face)) != 0) {
+		logMsg("Error loading init_msg font %s: %s", filename,
+		    ft_err2str(err));
+		VERIFY(FT_Done_FreeType(ft) == 0);
+		free(filename);
+		return ;
+	}
+	free(filename);
+
+    clear_bottom_msg();
+
+    if (strlen(msg) == 0 ) {
+        return;
+    }
+    if (!get_text_block_size(msg, face, BOTTOM_MSG_FONT_SIZE,
+        &bottom_msg.width, &bottom_msg.height)) {
+        return;
+    }
+
+    tex_w = bottom_msg.width + 2 * MARGIN_SIZE;
+    tex_h = bottom_msg.height + 2 * MARGIN_SIZE;
+    tex_bytes = calloc(tex_w * tex_h * 4, 1);
+
+    /* fill with a black, semi-transparent background */
+    for (int i = 0; i < tex_w * tex_h; i++)
+        tex_bytes[i * 4 + 3] = (uint8_t)(255 * 0.67);
+
+    if (!render_text_block(msg, face, BOTTOM_MSG_FONT_SIZE,
+        MARGIN_SIZE, MARGIN_SIZE + BOTTOM_MSG_FONT_SIZE,
+        255, 255, 255, tex_bytes, tex_w, tex_h)) {
+        free(tex_bytes);
+        return;
+    }
+
+    bottom_msg.msg = msg;
+    bottom_msg.bytes = tex_bytes;
+
+
+
+    glGenTextures(1, &bottom_msg.texture);
+    glBindTexture(GL_TEXTURE_2D, bottom_msg.texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+        GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+        GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex_w, tex_h, 0,
+        GL_RGBA, GL_UNSIGNED_BYTE, bottom_msg.bytes);
+
+}
+
+
+void
+clear_bottom_msg(void)
+{
+	if (bottom_msg.msg != NULL) {
+		glDeleteTextures(1, &bottom_msg.texture);
+		free(bottom_msg.bytes);
+		memset(&bottom_msg, 0, sizeof (bottom_msg));
+	}
+}
+
+void
+draw_bottom_msg(int screen_x, int screen_y) {
+
+    UNUSED(screen_y);
+
+    glBindTexture(GL_TEXTURE_2D, bottom_msg.texture);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 1.0);
+    glVertex2f((screen_x - bottom_msg.width) / 2 - MARGIN_SIZE, 0);
+    glTexCoord2f(0.0, 0.0);
+    glVertex2f((screen_x - bottom_msg.width) / 2 - MARGIN_SIZE,
+        bottom_msg.height + 2 * MARGIN_SIZE);
+    glTexCoord2f(1.0, 0.0);
+    glVertex2f((screen_x + bottom_msg.width) / 2 + MARGIN_SIZE,
+        bottom_msg.height + 2 * MARGIN_SIZE);
+    glTexCoord2f(1.0, 1.0);
+    glVertex2f((screen_x + bottom_msg.width) / 2 + MARGIN_SIZE, 0);
+    glEnd();
 }
