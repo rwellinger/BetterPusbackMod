@@ -915,6 +915,7 @@ bp_priv_enable(void) {
     prefs_menu_item = XPLMAppendMenuItem(root_menu,
                                          _("Preferences..."), &prefs_menu_item, 1);
 
+	prefs_enable = B_TRUE;
     start_pb_enable = B_TRUE;
     conn_first_enable = B_TRUE;
     stop_pb_enable = B_FALSE;
