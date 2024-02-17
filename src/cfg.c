@@ -429,6 +429,7 @@ create_main_window(void) {
     int col1_width, col2_width, col3_width, col4_width;
     int main_window_width, l;
     char *prefs_title;
+    size_t main_window_height = MAIN_WINDOW_HEIGHT ;
 
     checkbox_t col1[] = {
             {_("User interface"), NULL,                    NULL},
@@ -490,12 +491,14 @@ create_main_window(void) {
     col3_width = measure_checkboxes_width(radio_out);
     col4_width = measure_checkboxes_width(sound_out);
     main_window_width = 4 * MARGIN + col1_width + col2_width + MAX(col3_width, col4_width);
-
+    if ((buttons.num_radio_boxes + buttons.num_sound_boxes) > 6) {
+        main_window_height += (buttons.num_radio_boxes + buttons.num_sound_boxes) * BUTTON_HEIGHT ;
+    }
     l = snprintf(NULL, 0, "%s", _("BetterPushback Preferences"));
     prefs_title = safe_malloc(l + 1);
     snprintf(prefs_title, l + 1, "%s", _("BetterPushback Preferences"));
     main_win = create_widget_rel(100, 100, B_FALSE, main_window_width,
-                                 MAIN_WINDOW_HEIGHT, 0, prefs_title, 1, NULL,
+                                 main_window_height, 0, prefs_title, 1, NULL,
                                  xpWidgetClass_MainWindow);
     XPSetWidgetProperty(main_win, xpProperty_MainWindowHasCloseBoxes, 1);
     XPAddWidgetCallback(main_win, main_window_cb);
@@ -521,29 +524,29 @@ create_main_window(void) {
     } while (0)
 
     LAYOUT_PUSH_BUTTON(save_cfg, (main_window_width - BUTTON_WIDTH) / 2,
-                       MAIN_WINDOW_HEIGHT - MARGIN, BUTTON_WIDTH, BUTTON_HEIGHT,
+                       main_window_height - MARGIN, BUTTON_WIDTH, BUTTON_HEIGHT,
                        _("Save preferences"), save_prefs_tooltip);
 
     const int MAIN_WINDOW_SPACE = 25;
 
     create_widget_rel(MARGIN,
-                      MAIN_WINDOW_HEIGHT - 101 - (MAIN_WINDOW_SPACE + 10), B_FALSE,
+                      main_window_height - 101 - (MAIN_WINDOW_SPACE + 10), B_FALSE,
                       main_window_width - 4 * MARGIN,
                       BUTTON_HEIGHT, 1, _("** Settings related to the current aircraft"), 0, main_win,
                       xpWidgetClass_Caption);
 
     create_widget_rel(MARGIN,
-                      MAIN_WINDOW_HEIGHT - 75 - MAIN_WINDOW_SPACE, B_FALSE,
+                      main_window_height - 75 - MAIN_WINDOW_SPACE, B_FALSE,
                       main_window_width - 4 * MARGIN,
                       BUTTON_HEIGHT, 1, COPYRIGHT1, 0, main_win,
                       xpWidgetClass_Caption);
     create_widget_rel(MARGIN,
-                      MAIN_WINDOW_HEIGHT - 62 - MAIN_WINDOW_SPACE, B_FALSE,
+                      main_window_height - 62 - MAIN_WINDOW_SPACE, B_FALSE,
                       main_window_width - 4 * MARGIN,
                       BUTTON_HEIGHT, 1, COPYRIGHT2, 0, main_win,
                       xpWidgetClass_Caption);
     create_widget_rel(MARGIN,
-                      MAIN_WINDOW_HEIGHT - 49 - (MAIN_WINDOW_SPACE - 10), B_FALSE,
+                      main_window_height - 49 - (MAIN_WINDOW_SPACE - 10), B_FALSE,
                       main_window_width - 4 * MARGIN,
                       BUTTON_HEIGHT, 1, _(TOOLTIP_HINT), 0, main_win,
                       xpWidgetClass_Caption);
