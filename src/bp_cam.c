@@ -79,6 +79,7 @@
 #define    MIN_BUTTON_SCALE    0.5
 
 #define    BP_PLANNER_VISIBILITY    40000    /* meters */
+#define    BP_PLANNER_VISIBILITY_SM 25      /* statut miles */
 
 #define    PREDICTION_DRAWING_PHASE    xplm_Phase_Window
 #define    PREDICTION_DRAWING_PHASE_BEFORE    1
@@ -103,6 +104,7 @@ static vect2_t cursor_world_pos;
 static bool_t force_root_win_focus = B_TRUE;
 static float saved_visibility;
 static int saved_cloud_types[3];
+static float fsaved_cloud_types[3];
 static bool_t saved_real_wx;
 static XPLMObjectRef cam_lamp_obj = NULL;
 static XPLMInstanceRef cam_lamp_inst = NULL;
@@ -1105,6 +1107,13 @@ find_drs(void) {
         fdr_find(&drs.use_real_wx, "sim/weather/use_real_weather_bool");
     }
 
+    if ( (bp_xp_ver >= 12000) && (bp_xp_ver < 13000) ) {
+        fdr_find(&drs.visibility, "sim/weather/region/visibility_reported_sm");
+        fdr_find(&drs.cloud_types[0], "sim/weather/region/cloud_type");
+        fdr_find(&drs.use_real_wx, "sim/weather/region/change_mode");
+    }
+
+
     fdr_find(&drs.cam_x, "sim/graphics/view/view_x");
     fdr_find(&drs.cam_y, "sim/graphics/view/view_y");
     fdr_find(&drs.cam_z, "sim/graphics/view/view_z");
@@ -1216,25 +1225,34 @@ bp_cam_start(void) {
         route_load(GEO_POS2(dr_getf(&drs.lat), dr_getf(&drs.lon)),
                    dr_getf(&drs.hdg), &bp.segs);
     }
+
+    /*
+        * While the planner is active, we override the current
+        * visibility and real weather usage, so that the user can
+        * clearly see the path while planning. After we're done,
+        * we'll restore the settings.
+        */
+    saved_visibility = dr_getf(&drs.visibility);
+    saved_real_wx = dr_geti(&drs.use_real_wx);
+
     if (bp_xp_ver < 12000) {
-        /*
-         * While the planner is active, we override the current
-         * visibility and real weather usage, so that the user can
-         * clearly see the path while planning. After we're done,
-         * we'll restore the settings.
-         */
-        saved_visibility = dr_getf(&drs.visibility);
         saved_cloud_types[0] = dr_geti(&drs.cloud_types[0]);
         saved_cloud_types[1] = dr_geti(&drs.cloud_types[1]);
         saved_cloud_types[2] = dr_geti(&drs.cloud_types[2]);
-        saved_real_wx = dr_geti(&drs.use_real_wx);
-
         dr_setf(&drs.visibility, BP_PLANNER_VISIBILITY);
         dr_seti(&drs.cloud_types[0], 0);
         dr_seti(&drs.cloud_types[1], 0);
         dr_seti(&drs.cloud_types[2], 0);
         dr_seti(&drs.use_real_wx, 0);
     }
+    if ( (bp_xp_ver >= 12000) && (bp_xp_ver < 13000) ) {
+        float zero_cloud[3] = {0.0};
+        dr_getvf32(&drs.cloud_types[0], fsaved_cloud_types, 0, 3);
+        dr_setvf32(&drs.cloud_types[0], zero_cloud, 0, 3);
+        dr_setf(&drs.visibility, BP_PLANNER_VISIBILITY_SM);
+        dr_seti(&drs.use_real_wx, 3);
+    }
+
     cam_inited = B_TRUE;
 
     updateAvailable = getPluginUpdateStatus();
@@ -1278,13 +1296,18 @@ bp_cam_stop(void) {
     cockpit_view_cmd = XPLMFindCommand("sim/view/3d_cockpit_cmnd_look");
     ASSERT(cockpit_view_cmd != NULL);
     XPLMCommandOnce(cockpit_view_cmd);
+    
+    dr_setf(&drs.visibility, saved_visibility);
+    dr_seti(&drs.use_real_wx, saved_real_wx);
     if (bp_xp_ver < 12000) {
-        dr_setf(&drs.visibility, saved_visibility);
         dr_seti(&drs.cloud_types[0], saved_cloud_types[0]);
         dr_seti(&drs.cloud_types[1], saved_cloud_types[1]);
         dr_seti(&drs.cloud_types[2], saved_cloud_types[2]);
-        dr_seti(&drs.use_real_wx, saved_real_wx);
     }
+    if ( (bp_xp_ver >= 12000) && (bp_xp_ver < 13000) ) {
+        dr_setvf32(&drs.cloud_types[0], fsaved_cloud_types, 0, 3);
+    }
+
     cam_inited = B_FALSE;
 
     pop_fov_values();
